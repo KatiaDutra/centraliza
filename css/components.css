@@ -13,6 +13,15 @@
   --cancelado: #94A3B8;     --cancelado-fundo: #E2E8F0;     --cancelado-texto: #475569;
 }
 
+/* No tema escuro, fundos translúcidos e textos claros */
+[data-theme="dark"] {
+  --aberto-fundo: rgb(220 38 38 / 0.18);        --aberto-texto: #FCA5A5;
+  --em-andamento-fundo: rgb(37 99 235 / 0.22);  --em-andamento-texto: #93C5FD;
+  --aguardando-fundo: rgb(139 92 246 / 0.22);   --aguardando-texto: #C4B5FD;
+  --resolvido-fundo: rgb(20 184 166 / 0.18);    --resolvido-texto: #5EEAD4;
+  --cancelado-fundo: rgb(148 163 184 / 0.16);   --cancelado-texto: #CBD5E1;
+}
+
 /* ---------- Utilitário ----------
    Esconde da tela, mas mantém para leitores de tela.
    Usado em títulos que organizam a página sem precisar aparecer. */
@@ -76,7 +85,7 @@
   min-height: 36px;
   padding: 6px 10px;
   background: transparent;
-  color: var(--azul);
+  color: var(--link);
 }
 
 .botao--texto:hover {
@@ -89,7 +98,7 @@
 }
 
 .botao--perigo:hover {
-  background: var(--aberto-texto);
+  background: #B91C1C;
 }
 
 .botao--whatsapp {
@@ -191,7 +200,7 @@
   line-height: 1;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums; /* algarismos com a mesma largura */
-  color: var(--azul-principal);
+  color: var(--numero-destaque);
 }
 
 /* Bolinha colorida antes do nome de cada indicador de status */
@@ -336,6 +345,26 @@
 
 .status-select:hover {
   border-color: var(--s-cor);
+}
+
+/* A lista que abre ao clicar no seletor segue as cores do tema */
+.status-select option {
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+/* "Em espera há X dias", embaixo da data de abertura na lista */
+.espera {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+/* Esperando há muitos dias: destaque */
+.espera--alerta {
+  font-weight: 700;
+  color: var(--alerta-texto);
 }
 
 /* ---------- Prioridade ----------
@@ -591,13 +620,13 @@
 .campo select[aria-invalid="true"],
 .campo textarea[aria-invalid="true"] {
   padding: 9px 11px; /* compensa a borda mais grossa, para o campo não "pular" */
-  border: 2px solid var(--aberto);
+  border: 2px solid var(--erro);
 }
 
 .campo__erro {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--aberto);
+  color: var(--erro);
 }
 
 /* Parágrafo de erro vazio não ocupa espaço */
@@ -666,7 +695,7 @@
 }
 
 .grupo-opcoes[aria-invalid="true"] .opcao span {
-  border-color: var(--aberto);
+  border-color: var(--erro);
 }
 
 /* ---------- Formulário ---------- */
@@ -774,7 +803,7 @@
   border-radius: var(--raio);
   background: var(--superficie);
   color: var(--texto);
-  box-shadow: 0 24px 48px rgb(11 45 107 / 0.22);
+  box-shadow: 0 24px 48px var(--sombra);
 }
 
 /* ::backdrop é o fundo escurecido atrás do modal aberto */
@@ -948,7 +977,7 @@
   border-left: 5px solid var(--a-cor);
   border-radius: var(--raio-pequeno);
   background: var(--superficie);
-  box-shadow: 0 12px 32px rgb(11 45 107 / 0.2);
+  box-shadow: 0 12px 32px var(--sombra);
   font-size: 0.92rem;
   font-weight: 600;
   animation: aviso-entrada 0.2s ease-out;

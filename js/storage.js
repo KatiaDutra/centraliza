@@ -7,6 +7,7 @@
 const CHAVE_ATENDIMENTOS = 'centraliza:atendimentos';
 const CHAVE_PROXIMO_ID = 'centraliza:proximo-id';
 const ID_INICIAL = 1001;
+const CHAVE_TEMA = 'centraliza:tema';
 
 /**
  * Carrega os atendimentos salvos no navegador.
@@ -71,4 +72,24 @@ export function reservarProximoId(atendimentos) {
   }
 
   return id;
+}
+
+/* ---------- Tema ---------- */
+
+/** Devolve 'light', 'dark' ou null (quando a pessoa ainda não escolheu). */
+export function carregarTema() {
+  try {
+    const tema = localStorage.getItem(CHAVE_TEMA);
+    return tema === 'light' || tema === 'dark' ? tema : null;
+  } catch (erro) {
+    return null;
+  }
+}
+
+export function salvarTema(tema) {
+  try {
+    localStorage.setItem(CHAVE_TEMA, tema);
+  } catch (erro) {
+    // Sem localStorage, o tema vale só até fechar a página
+  }
 }

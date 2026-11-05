@@ -4,7 +4,7 @@
    Todo texto que veio do usuário passa por escaparHtml().
    ========================================================== */
 
-import { STATUS, ORDEM_STATUS, PRIORIDADES } from './config.js';
+import { STATUS, ORDEM_STATUS, PRIORIDADES, DIAS_PARA_ALERTA } from './config.js';
 import { escaparHtml, formatarData, formatarDataHora, apenasDigitos, descreverEspera } from './utils.js';
 import { diasEmEspera } from './atendimentos.js';
 
@@ -35,6 +35,15 @@ function seletorStatus(atendimento, local = 'lista', id = '') {
             aria-label="Status do atendimento #${atendimento.id}">
       ${opcoes}
     </select>`;
+}
+
+/** "Em espera há X dias" embaixo da data. Atendimentos encerrados não mostram nada. */
+function textoEspera(atendimento) {
+  const dias = diasEmEspera(atendimento);
+  if (dias === null) return '';
+
+  const classe = dias >= DIAS_PARA_ALERTA ? 'espera espera--alerta' : 'espera';
+  return `<span class="${classe}">${descreverEspera(dias)}</span>`;
 }
 
 function botaoDetalhes(atendimento) {
@@ -148,7 +157,10 @@ export function renderizarLista(container, atendimentos, temFiltro) {
       <td class="col-assunto" data-rotulo="Assunto">${escaparHtml(atendimento.assunto)}</td>
       <td data-rotulo="Departamento">${escaparHtml(atendimento.departamento)}</td>
       <td data-rotulo="Prioridade">${seloPrioridade(atendimento.prioridade)}</td>
-      <td data-rotulo="Abertura"><time datetime="${atendimento.dataAbertura}">${formatarData(atendimento.dataAbertura)}</time></td>
+      <td data-rotulo="Abertura">
+        <time datetime="${atendimento.dataAbertura}">${formatarData(atendimento.dataAbertura)}</time>
+        ${textoEspera(atendimento)}
+      </td>
       <td class="col-status" data-rotulo="Status">${seletorStatus(atendimento)}</td>
       <td class="col-acoes">${botaoDetalhes(atendimento)}</td>
     </tr>

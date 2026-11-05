@@ -16,6 +16,20 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <!-- Aplica o tema salvo antes de a página aparecer, para não piscar o tema errado.
+       Precisa ser um script comum, aqui no <head>: o módulo só roda depois. -->
+  <script>
+    (function () {
+      var tema = null;
+      try { tema = localStorage.getItem('centraliza:tema'); } catch (erro) { tema = null; }
+      if (tema !== 'light' && tema !== 'dark') {
+        // Sem escolha salva, segue a preferência do sistema
+        tema = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.theme = tema;
+    })();
+  </script>
+
   <!-- JavaScript: type="module" já espera a página carregar antes de rodar -->
   <script type="module" src="js/main.js"></script>
 </head>
@@ -48,7 +62,7 @@
       <!-- ========== TOPO ========== -->
       <header class="topo">
         <h1 class="topo__titulo">Início</h1>
-        <button type="button" class="botao botao--secundario topo__tema">Tema escuro</button>
+        <button type="button" class="botao botao--secundario topo__tema" id="botao-tema">Tema escuro</button>
       </header>
 
       <main id="conteudo" tabindex="-1">

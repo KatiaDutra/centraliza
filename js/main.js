@@ -7,7 +7,7 @@
 
 import { STATUS, QUANTIDADE_RECENTES, LIMITES, ORDENACOES, ITENS_POR_PAGINA } from './config.js';
 import { formatarTelefone, formatarDataHora } from './utils.js';
-import { carregarAtendimentos, salvarAtendimentos, reservarProximoId } from './storage.js';
+import { carregarAtendimentos, salvarAtendimentos, reservarProximoId, carregarTema, salvarTema } from './storage.js';
 import { gerarAtendimentosExemplo } from './exemplos.js';
 import {
   validarAtendimento, criarAtendimento,
@@ -389,6 +389,29 @@ formulario.addEventListener('reset', () => {
     atualizarDataPrevista();
   });
 });
+
+/* ---------- Tema claro e escuro ---------- */
+
+const botaoTema = document.getElementById('botao-tema');
+
+/**
+ * Aplica o tema na página. O CSS reage ao atributo data-theme do <html>.
+ * O texto do botão diz o que vai acontecer ao clicar.
+ */
+function aplicarTema(tema) {
+  document.documentElement.dataset.theme = tema;
+  botaoTema.textContent = tema === 'dark' ? 'Tema claro' : 'Tema escuro';
+}
+
+botaoTema.addEventListener('click', () => {
+  const novoTema = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  aplicarTema(novoTema);
+  salvarTema(novoTema); // só salva quando a pessoa escolhe de verdade
+});
+
+// Ao abrir: o tema salvo ou, se não houver, o do sistema
+const temaDoSistema = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+aplicarTema(carregarTema() ?? temaDoSistema);
 
 /* ---------- Início ---------- */
 

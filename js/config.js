@@ -41,3 +41,6 @@ export const ORDENACOES = {
 };
 
 export const ITENS_POR_PAGINA = 10;
+
+// A partir de quantos dias em espera o atendimento ganha destaque na lista
+export const DIAS_PARA_ALERTA = 5;

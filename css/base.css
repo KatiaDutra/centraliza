@@ -23,10 +23,39 @@
   --texto-suave: #55657F;
   --sidebar-texto: #C9D6F2;
 
+  /* Cores com papel definido (mudam no tema escuro) */
+  --link: var(--azul);
+  --erro: #DC2626;
+  --numero-destaque: var(--azul-principal);
+  --alerta-texto: #B45309;
+  --sombra: rgb(11 45 107 / 0.22);
+
   /* Forma e fonte */
   --raio: 14px;
   --raio-pequeno: 8px;
   --fonte: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  color-scheme: light; /* barras de rolagem e campos nativos no modo claro */
+}
+
+/* ---------- Tema escuro ----------
+   Só redefinimos as variáveis. Como todo o CSS usa var(--...),
+   a página inteira muda de cor sem repetir nenhuma regra. */
+[data-theme="dark"] {
+  --fundo: #071430;
+  --superficie: #0E1F44;
+  --borda: #1E3666;
+  --borda-forte: #2C4A85;
+  --texto: #E6EDFA;
+  --texto-suave: #9FB0CF;
+
+  --link: #93C5FD;
+  --erro: #FCA5A5;
+  --numero-destaque: #FFFFFF;
+  --alerta-texto: #FBBF24;
+  --sombra: rgb(0 0 0 / 0.5);
+
+  color-scheme: dark;
 }
 
 /* ---------- 2. Reset ----------
@@ -83,7 +112,7 @@ h1, h2, h3 {
 }
 
 a {
-  color: var(--azul);
+  color: var(--link);
 }
 
 /* ---------- 4. Acessibilidade ---------- */
