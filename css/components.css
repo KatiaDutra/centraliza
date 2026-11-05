@@ -101,6 +101,17 @@
   background: #B91C1C;
 }
 
+/* Ação destrutiva secundária: só o contorno vermelho, para não chamar mais atenção que o resto */
+.botao--perigo-contorno {
+  background: transparent;
+  border-color: var(--erro);
+  color: var(--erro);
+}
+
+.botao--perigo-contorno:hover {
+  background: var(--aberto-fundo);
+}
+
 .botao--whatsapp {
   background: var(--superficie);
   border-color: var(--verde);
@@ -876,6 +887,14 @@
   align-items: end;
   justify-content: space-between;
   gap: 16px;
+}
+
+/* Rodapé dos detalhes, separado do resto por uma linha */
+.detalhes__rodape {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--borda);
 }
 
 /* Modal de confirmação, mais estreito */

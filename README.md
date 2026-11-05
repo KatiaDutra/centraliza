@@ -58,6 +58,7 @@ Desenvolvido com HTML, CSS e JavaScript puro, sem frameworks nem bibliotecas.
 - Detalhes em modal, com o histórico de status em linha do tempo.
 - Tempo de espera dos atendimentos não encerrados, com destaque a partir de 5 dias.
 - Botão para conversar com o cliente no WhatsApp, com mensagem pronta.
+- Exclusão de atendimentos registrados por engano, a partir dos detalhes e com confirmação. O número excluído não é reaproveitado.
 
 **Geral**
 
@@ -114,7 +115,7 @@ centraliza/
 │   └── components.css    Botões, indicadores, tabela, formulário, modais e avisos
 ├── js/
 │   ├── main.js           Estado da aplicação, navegação e eventos
-│   ├── atendimentos.js   Regras: validar, criar, filtrar, ordenar, paginar, mudar status
+│   ├── atendimentos.js   Regras: validar, criar, excluir, filtrar, ordenar, paginar, mudar status
 │   ├── ui.js             Funções que desenham a interface
 │   ├── storage.js        Único arquivo que acessa o localStorage
 │   ├── config.js         Status, prioridades, departamentos e limites

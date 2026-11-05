@@ -7,12 +7,14 @@
 
 import { STATUS, QUANTIDADE_RECENTES, LIMITES, ORDENACOES, ITENS_POR_PAGINA } from './config.js';
 import { formatarTelefone, formatarDataHora } from './utils.js';
-import { carregarAtendimentos, salvarAtendimentos, reservarProximoId, carregarTema, salvarTema } from './storage.js';
+import {
+  carregarAtendimentos, salvarAtendimentos, reservarProximoId, sincronizarProximoId, carregarTema, salvarTema,
+} from './storage.js';
 import { gerarAtendimentosExemplo } from './exemplos.js';
 import {
   validarAtendimento, criarAtendimento,
   filtrarRegistrosValidos, calcularIndicadores, obterRecentes,
-  filtrarAtendimentos, ordenarAtendimentos, paginar, alterarStatus,
+  filtrarAtendimentos, ordenarAtendimentos, paginar, alterarStatus, removerAtendimento,
 } from './atendimentos.js';
 import {
   renderizarIndicadores, renderizarRecentes, renderizarLista, renderizarPaginacao,
@@ -38,10 +40,12 @@ function carregarDados() {
   if (situacao === 'vazio') {
     estado.atendimentos = gerarAtendimentosExemplo();
     salvarAtendimentos(estado.atendimentos);
+    sincronizarProximoId(estado.atendimentos);
     return;
   }
 
   estado.atendimentos = filtrarRegistrosValidos(atendimentos);
+  sincronizarProximoId(estado.atendimentos);
 
   if (situacao === 'corrompido') {
     mostrarAviso('Os dados salvos neste navegador estavam ilegíveis e foram ignorados. A lista começou vazia.', 'erro');
@@ -102,8 +106,9 @@ function atualizarTela() {
   atualizarLista();
 
   // Se o modal está aberto, redesenha também os detalhes
-  if (estado.detalhesAbertos !== null) {
-    renderizarDetalhes(conteudoDetalhes, buscarAtendimento(estado.detalhesAbertos));
+  const aberto = estado.detalhesAbertos !== null ? buscarAtendimento(estado.detalhesAbertos) : null;
+  if (aberto) {
+    renderizarDetalhes(conteudoDetalhes, aberto);
   }
 
   if (seletorFocado) {
@@ -281,8 +286,40 @@ modalDetalhes.addEventListener('close', () => {
   estado.detalhesAbertos = null;
 
   const telaVisivel = document.querySelector('[data-tela]:not([hidden])');
-  telaVisivel?.querySelector(`[data-acao="detalhes"][data-id="${id}"]`)?.focus();
+  const botaoDeOrigem = telaVisivel?.querySelector(`[data-acao="detalhes"][data-id="${id}"]`);
+
+  // Se o atendimento foi excluído, o botão não existe mais: o foco vai para o conteúdo
+  if (botaoDeOrigem) {
+    botaoDeOrigem.focus();
+  } else {
+    conteudo.focus({ preventScroll: true });
+  }
 });
+
+/* ---------- Exclusão ---------- */
+
+async function excluirAtendimento(id) {
+  const atendimento = buscarAtendimento(id);
+  if (!atendimento) return;
+
+  const confirmou = await confirmar({
+    titulo: `Excluir o atendimento #${id}?`,
+    mensagem: `O atendimento de ${atendimento.cliente} será apagado, junto com o histórico. Esta ação não pode ser desfeita.`,
+    textoConfirmar: 'Excluir atendimento',
+  });
+
+  if (!confirmou) return;
+
+  // Fecha os detalhes antes, para o aviso aparecer na página e não dentro do modal.
+  // Zera o id já aqui: o evento "close" só roda um instante depois.
+  estado.detalhesAbertos = null;
+  if (modalDetalhes.open) modalDetalhes.close();
+
+  estado.atendimentos = removerAtendimento(estado.atendimentos, id);
+  persistir();
+  atualizarTela();
+  mostrarAviso(`Atendimento #${id} excluído.`);
+}
 
 /* ---------- Eventos das tabelas (delegação no documento inteiro) ---------- */
 
@@ -290,6 +327,12 @@ modalDetalhes.addEventListener('close', () => {
 document.addEventListener('click', (evento) => {
   const botao = evento.target.closest('[data-acao="detalhes"]');
   if (botao) abrirDetalhes(Number(botao.dataset.id));
+});
+
+// Botão "Excluir atendimento", dentro dos detalhes
+document.addEventListener('click', (evento) => {
+  const botao = evento.target.closest('[data-acao="excluir"]');
+  if (botao) excluirAtendimento(Number(botao.dataset.id));
 });
 
 // Qualquer seletor de status, na lista ou no modal

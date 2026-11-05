@@ -245,7 +245,13 @@ export function renderizarDetalhes(container, atendimento) {
     <section class="detalhes__secao">
       <h3 class="detalhes__subtitulo">Histórico de status</h3>
       <ol class="linha-tempo">${historico}</ol>
-    </section>`;
+    </section>
+
+    <footer class="detalhes__rodape">
+      <button type="button" class="botao botao--perigo-contorno" data-acao="excluir" data-id="${atendimento.id}">
+        Excluir atendimento
+      </button>
+    </footer>`;
 }
 
 /* ---------- Confirmação ---------- */

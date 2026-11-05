@@ -50,6 +50,29 @@ export function salvarAtendimentos(atendimentos) {
 }
 
 /**
+ * Garante que o contador salvo seja maior que todos os números existentes.
+ * Chamada ao abrir a aplicação: assim, se o atendimento de número mais alto
+ * for excluído depois, o número dele não volta a ser usado.
+ */
+export function sincronizarProximoId(atendimentos) {
+  let contadorSalvo = 0;
+  try {
+    contadorSalvo = Number(localStorage.getItem(CHAVE_PROXIMO_ID)) || 0;
+  } catch (erro) {
+    return;
+  }
+
+  const maiorExistente = atendimentos.reduce((maior, atendimento) => Math.max(maior, atendimento.id), 0);
+  const proximo = Math.max(contadorSalvo, maiorExistente + 1, ID_INICIAL);
+
+  try {
+    localStorage.setItem(CHAVE_PROXIMO_ID, String(proximo));
+  } catch (erro) {
+    // Sem localStorage, nada a fazer
+  }
+}
+
+/**
  * Reserva o próximo número de atendimento e já guarda o seguinte.
  * Usa o maior valor entre o contador salvo e os números que já existem,
  * para nunca repetir um número.

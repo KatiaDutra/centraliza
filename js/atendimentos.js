@@ -107,6 +107,13 @@ export function diasEmEspera(atendimento, agora = new Date()) {
   return diasDesde(atendimento.dataAbertura, agora);
 }
 
+/* ---------- Exclusão ---------- */
+
+/** Devolve uma nova lista sem o atendimento do id informado. */
+export function removerAtendimento(atendimentos, id) {
+  return atendimentos.filter((atendimento) => atendimento.id !== id);
+}
+
 /* ---------- Leitura e indicadores ---------- */
 
 /**
