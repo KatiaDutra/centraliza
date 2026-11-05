@@ -1,0 +1,555 @@
+/* ==========================================================
+   COMPONENTES: peças reutilizadas em várias telas
+   ========================================================== */
+
+/* ---------- Cores dos status ----------
+   Cada status tem três tons: a cor forte, um fundo claro e um texto escuro.
+   O texto escuro sobre o fundo claro garante contraste para leitura. */
+:root {
+  --aberto: #DC2626;        --aberto-fundo: #FEE2E2;        --aberto-texto: #991B1B;
+  --em-andamento: #2563EB;  --em-andamento-fundo: #DBEAFE;  --em-andamento-texto: #1E40AF;
+  --aguardando: #8B5CF6;    --aguardando-fundo: #EDE9FE;    --aguardando-texto: #5B21B6;
+  --resolvido: #14B8A6;     --resolvido-fundo: #CCFBF1;     --resolvido-texto: #0F766E;
+  --cancelado: #94A3B8;     --cancelado-fundo: #E2E8F0;     --cancelado-texto: #475569;
+}
+
+/* ---------- Utilitário ----------
+   Esconde da tela, mas mantém para leitores de tela.
+   Usado em títulos que organizam a página sem precisar aparecer. */
+.visualmente-oculto {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tela__intro {
+  max-width: 60ch;
+  color: var(--texto-suave);
+}
+
+/* ---------- Botões e links ---------- */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px; /* área mínima confortável para o dedo */
+  padding: 9px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--raio-pequeno);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.botao--primario {
+  background: var(--azul);
+  color: #FFFFFF;
+}
+
+.botao--primario:hover {
+  background: var(--azul-escuro);
+}
+
+.botao--secundario {
+  background: var(--superficie);
+  border-color: var(--borda-forte);
+  color: var(--texto);
+}
+
+.botao--secundario:hover {
+  background: var(--fundo);
+}
+
+.botao--texto {
+  min-height: 36px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--azul);
+}
+
+.botao--texto:hover {
+  background: var(--em-andamento-fundo);
+}
+
+.botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.link {
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Blocos (as caixas brancas) ---------- */
+
+.bloco,
+.painel {
+  padding: 20px 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+}
+
+.bloco__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.bloco__titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .bloco,
+  .painel {
+    padding: 24px;
+  }
+}
+
+/* ---------- Indicadores ---------- */
+
+.painel {
+  display: grid;
+  gap: 24px;
+}
+
+/* Celular: 2 por linha. Computador: 4 por linha. */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 0;
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column-reverse; /* número em cima, nome embaixo, sem mudar a ordem do HTML */
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 0 16px;
+  border-left: 1px solid var(--borda);
+}
+
+.indicador:nth-child(odd) {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.indicador dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.indicador dd {
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums; /* algarismos com a mesma largura */
+  color: var(--azul-principal);
+}
+
+/* Bolinha colorida antes do nome de cada indicador de status */
+.indicador--aberto dt::before,
+.indicador--em-andamento dt::before,
+.indicador--resolvido dt::before {
+  content: "";
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.indicador--aberto dt::before { background: var(--aberto); }
+.indicador--em-andamento dt::before { background: var(--em-andamento); }
+.indicador--resolvido dt::before { background: var(--resolvido); }
+
+@media (min-width: 768px) {
+  .indicadores {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .indicador {
+    padding: 0 24px;
+  }
+
+  .indicador:nth-child(odd) {
+    padding-left: 24px;
+    border-left: 1px solid var(--borda);
+  }
+
+  .indicador:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .indicador dd {
+    font-size: 2.6rem;
+  }
+}
+
+/* ---------- Barra de distribuição por status ---------- */
+
+.distribuicao {
+  display: grid;
+  gap: 12px;
+}
+
+/* Cada pedaço cresce na proporção do seu flex-grow (a quantidade de atendimentos) */
+.distribuicao__barra {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.distribuicao__barra span {
+  min-width: 6px;
+}
+
+.distribuicao__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.distribuicao__legenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.distribuicao__legenda strong {
+  color: var(--texto);
+}
+
+.marcador {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.cor--aberto { background: var(--aberto); }
+.cor--em-andamento { background: var(--em-andamento); }
+.cor--aguardando { background: var(--aguardando); }
+.cor--resolvido { background: var(--resolvido); }
+.cor--cancelado { background: var(--cancelado); }
+
+/* ---------- Selos de status ----------
+   As classes status--* só definem variáveis (--s-fundo, --s-texto, --s-cor).
+   O selo e o seletor usam essas variáveis, então um mesmo nome de classe
+   serve para os dois. */
+
+.status--aberto       { --s-fundo: var(--aberto-fundo);       --s-texto: var(--aberto-texto);       --s-cor: var(--aberto); }
+.status--em-andamento { --s-fundo: var(--em-andamento-fundo); --s-texto: var(--em-andamento-texto); --s-cor: var(--em-andamento); }
+.status--aguardando   { --s-fundo: var(--aguardando-fundo);   --s-texto: var(--aguardando-texto);   --s-cor: var(--aguardando); }
+.status--resolvido    { --s-fundo: var(--resolvido-fundo);    --s-texto: var(--resolvido-texto);    --s-cor: var(--resolvido); }
+.status--cancelado    { --s-fundo: var(--cancelado-fundo);    --s-texto: var(--cancelado-texto);    --s-cor: var(--cancelado); }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--s-fundo);
+  color: var(--s-texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--s-cor);
+}
+
+/* Seletor de status na lista: mesmas cores do selo, com uma setinha */
+.status-select {
+  appearance: none; /* tira o visual padrão do navegador */
+  max-width: 100%;
+  min-height: 34px;
+  padding: 5px 30px 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-color: var(--s-fundo);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  color: var(--s-texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status-select:hover {
+  border-color: var(--s-cor);
+}
+
+/* ---------- Prioridade ----------
+   Três barrinhas desenhadas com gradientes: uma, duas ou três preenchidas. */
+
+.prioridade {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prioridade::before {
+  content: "";
+  width: 14px;
+  height: 10px;
+  background:
+    linear-gradient(currentColor, currentColor) 0 100% / 3px 40% no-repeat,
+    linear-gradient(var(--p-2, var(--borda-forte)), var(--p-2, var(--borda-forte))) 5px 100% / 3px 70% no-repeat,
+    linear-gradient(var(--p-3, var(--borda-forte)), var(--p-3, var(--borda-forte))) 10px 100% / 3px 100% no-repeat;
+}
+
+.prioridade--baixa { color: var(--texto-suave); }
+.prioridade--media { color: var(--texto); --p-2: currentColor; }
+.prioridade--alta  { color: var(--aberto-texto); --p-2: currentColor; --p-3: currentColor; font-weight: 800; }
+
+/* ---------- Tabela ----------
+   Aqui a regra é "desktop first": a tabela já nasce com cara de tabela,
+   então é mais simples desmontá-la só no celular (max-width) do que o contrário. */
+
+.tabela-rolagem {
+  position: relative;
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabela th,
+.tabela td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabela thead th {
+  background: var(--fundo);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela tbody tr:hover {
+  background: var(--fundo);
+}
+
+.col-numero {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.col-cliente {
+  font-weight: 600;
+}
+
+.col-acoes {
+  text-align: right;
+}
+
+/* Tablet e celular: cada linha vira um cartão */
+@media (max-width: 900px) {
+  .tabela {
+    display: block;
+  }
+
+  /* O cabeçalho some da tela, mas continua para leitores de tela */
+  .tabela thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .tabela tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .tabela tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px 16px;
+    padding: 16px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+  }
+
+  .tabela tbody tr:hover {
+    background: transparent;
+  }
+
+  .tabela td {
+    padding: 0;
+    border: 0;
+  }
+
+  /* O nome da coluna aparece em cima de cada valor, vindo do data-rotulo */
+  .tabela td::before {
+    content: attr(data-rotulo);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+  }
+
+  /* Número e status na primeira linha do cartão */
+  .tabela .col-numero {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+  }
+
+  .tabela .col-status {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .tabela .col-numero::before,
+  .tabela .col-status::before,
+  .tabela .col-acoes::before {
+    display: none;
+  }
+
+  /* Estes ocupam a largura toda do cartão */
+  .tabela .col-cliente,
+  .tabela .col-assunto,
+  .tabela .col-acoes {
+    grid-column: 1 / -1;
+  }
+
+  .tabela .col-acoes .botao {
+    width: 100%;
+    border: 1px solid var(--borda-forte);
+  }
+}
+
+/* No tablet, dois cartões por linha */
+@media (min-width: 600px) and (max-width: 900px) {
+  .tabela tbody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Campos (o básico; o formulário completo vem no passo 4) ---------- */
+
+.campo {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pequeno);
+  background: var(--superficie);
+}
+
+/* ---------- Filtros ---------- */
+
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px;
+}
+
+.filtros__busca,
+.filtros__limpar {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .filtros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filtros__limpar {
+    grid-column: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .filtros {
+    grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(150px, 1fr)) auto;
+  }
+
+  .filtros__busca {
+    grid-column: auto;
+  }
+}
+
+/* ---------- Paginação ---------- */
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}

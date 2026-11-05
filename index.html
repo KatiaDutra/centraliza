@@ -15,6 +15,7 @@
   <!-- Estilos do projeto -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
   <!-- Passo 3: aqui entra o script JavaScript -->
 </head>
 <body>
@@ -46,7 +47,7 @@
       <!-- ========== TOPO ========== -->
       <header class="topo">
         <h1 class="topo__titulo">Início</h1>
-        <button type="button" class="topo__tema">Tema escuro</button>
+        <button type="button" class="botao botao--secundario topo__tema">Tema escuro</button>
       </header>
 
       <main id="conteudo">
@@ -54,73 +55,98 @@
         <!-- ========== TELA 1: INÍCIO ========== -->
         <section id="inicio" class="tela">
           <h2>Início</h2>
-          <p>Acompanhe o andamento dos atendimentos do seu negócio.</p>
+          <p class="tela__intro">Acompanhe o andamento dos atendimentos do seu negócio.</p>
 
           <!-- Indicadores: <dl> é a lista certa para pares "nome: valor" -->
           <section class="painel" aria-labelledby="titulo-indicadores">
-            <h3 id="titulo-indicadores">Indicadores</h3>
+            <h3 class="visualmente-oculto" id="titulo-indicadores">Indicadores</h3>
             <dl class="indicadores">
               <div class="indicador">
                 <dt>Total de atendimentos</dt>
                 <dd>14</dd>
               </div>
-              <div class="indicador">
+              <div class="indicador indicador--aberto">
                 <dt>Em aberto</dt>
                 <dd>3</dd>
               </div>
-              <div class="indicador">
+              <div class="indicador indicador--em-andamento">
                 <dt>Em andamento</dt>
                 <dd>4</dd>
               </div>
-              <div class="indicador">
+              <div class="indicador indicador--resolvido">
                 <dt>Resolvidos</dt>
                 <dd>4</dd>
               </div>
             </dl>
+
+            <!-- Barra com a proporção de cada status.
+                 Por enquanto os números estão fixos; depois o JavaScript calcula. -->
+            <div class="distribuicao">
+              <div class="distribuicao__barra" role="img"
+                   aria-label="Distribuição por status: Aberto 3, Em andamento 4, Aguardando cliente 2, Resolvido 4, Cancelado 1">
+                <span class="cor--aberto" style="flex-grow: 3"></span>
+                <span class="cor--em-andamento" style="flex-grow: 4"></span>
+                <span class="cor--aguardando" style="flex-grow: 2"></span>
+                <span class="cor--resolvido" style="flex-grow: 4"></span>
+                <span class="cor--cancelado" style="flex-grow: 1"></span>
+              </div>
+              <ul class="distribuicao__legenda">
+                <li><span class="marcador cor--aberto"></span>Aberto <strong>3</strong></li>
+                <li><span class="marcador cor--em-andamento"></span>Em andamento <strong>4</strong></li>
+                <li><span class="marcador cor--aguardando"></span>Aguardando cliente <strong>2</strong></li>
+                <li><span class="marcador cor--resolvido"></span>Resolvido <strong>4</strong></li>
+                <li><span class="marcador cor--cancelado"></span>Cancelado <strong>1</strong></li>
+              </ul>
+            </div>
           </section>
 
           <section class="bloco" aria-labelledby="titulo-recentes">
-            <h3 id="titulo-recentes">Atendimentos recentes</h3>
-            <a href="#atendimentos">Ver todos</a>
+            <div class="bloco__cabecalho">
+              <h3 class="bloco__titulo" id="titulo-recentes">Atendimentos recentes</h3>
+              <a class="link" href="#atendimentos">Ver todos</a>
+            </div>
 
-            <table class="tabela">
-              <thead>
-                <tr>
-                  <th scope="col">Nº</th>
-                  <th scope="col">Cliente</th>
-                  <th scope="col">Assunto</th>
-                  <th scope="col">Departamento</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Abertura</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>#1003</td>
-                  <td>Maria Silva</td>
-                  <td>Pacote de arroz rasgado</td>
-                  <td>Suporte</td>
-                  <td><span class="status status--em-andamento">Em andamento</span></td>
-                  <td><time datetime="2026-11-04">04/11/2026</time></td>
-                </tr>
-                <tr>
-                  <td>#1002</td>
-                  <td>Eduardo Ribeiro</td>
-                  <td>Encomenda de bolo sem lactose</td>
-                  <td>Vendas</td>
-                  <td><span class="status status--aberto">Aberto</span></td>
-                  <td><time datetime="2026-11-04">04/11/2026</time></td>
-                </tr>
-                <tr>
-                  <td>#1001</td>
-                  <td>Luciana Ferreira</td>
-                  <td>Segunda via do boleto mensal</td>
-                  <td>Financeiro</td>
-                  <td><span class="status status--resolvido">Resolvido</span></td>
-                  <td><time datetime="2026-11-01">01/11/2026</time></td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- data-rotulo: o nome da coluna, mostrado no celular quando a linha vira cartão -->
+            <div class="tabela-rolagem">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Assunto</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Abertura</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1003</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Maria Silva</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Pacote de arroz rasgado</td>
+                    <td data-rotulo="Departamento">Suporte</td>
+                    <td class="col-status" data-rotulo="Status"><span class="status status--em-andamento">Em andamento</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
+                  </tr>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1002</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Eduardo Ribeiro</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Encomenda de bolo sem lactose</td>
+                    <td data-rotulo="Departamento">Vendas</td>
+                    <td class="col-status" data-rotulo="Status"><span class="status status--aberto">Aberto</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
+                  </tr>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1001</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Luciana Ferreira</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Segunda via do boleto mensal</td>
+                    <td data-rotulo="Departamento">Financeiro</td>
+                    <td class="col-status" data-rotulo="Status"><span class="status status--resolvido">Resolvido</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-01">01/11/2026</time></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
         </section>
 
@@ -130,9 +156,9 @@
 
           <!-- Pesquisa e filtros -->
           <section class="bloco filtros" aria-labelledby="titulo-filtros">
-            <h3 id="titulo-filtros">Pesquisa e filtros</h3>
+            <h3 class="visualmente-oculto" id="titulo-filtros">Pesquisa e filtros</h3>
 
-            <div class="campo">
+            <div class="campo filtros__busca">
               <label for="busca">Pesquisar</label>
               <input type="search" id="busca" placeholder="Nome do cliente ou número">
             </div>
@@ -170,89 +196,93 @@
               </select>
             </div>
 
-            <button type="button" id="limpar-filtros">Limpar filtros</button>
+            <button type="button" class="botao botao--secundario filtros__limpar" id="limpar-filtros">Limpar filtros</button>
           </section>
 
           <!-- Listagem -->
           <section class="bloco" aria-labelledby="contagem">
-            <h3 id="contagem">3 atendimentos encontrados</h3>
-            <a href="#novo">Novo atendimento</a>
+            <div class="bloco__cabecalho">
+              <h3 class="bloco__titulo" id="contagem">3 atendimentos encontrados</h3>
+              <a class="botao botao--primario" href="#novo">Novo atendimento</a>
+            </div>
 
-            <table class="tabela">
-              <thead>
-                <tr>
-                  <th scope="col">Nº</th>
-                  <th scope="col">Cliente</th>
-                  <th scope="col">Assunto</th>
-                  <th scope="col">Departamento</th>
-                  <th scope="col">Prioridade</th>
-                  <th scope="col">Abertura</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>#1003</td>
-                  <td>Maria Silva</td>
-                  <td>Pacote de arroz rasgado</td>
-                  <td>Suporte</td>
-                  <td>Alta</td>
-                  <td><time datetime="2026-11-04">04/11/2026</time></td>
-                  <td>
-                    <select aria-label="Status do atendimento #1003">
+            <div class="tabela-rolagem">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Assunto</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Prioridade</th>
+                    <th scope="col">Abertura</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="visualmente-oculto">Ações</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1003</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Maria Silva</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Pacote de arroz rasgado</td>
+                    <td data-rotulo="Departamento">Suporte</td>
+                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--alta">Alta</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
+                    <td class="col-status" data-rotulo="Status">
+                    <select class="status-select status--em-andamento" aria-label="Status do atendimento #1003">
                       <option value="aberto">Aberto</option>
                       <option value="em-andamento" selected>Em andamento</option>
                       <option value="aguardando">Aguardando cliente</option>
                       <option value="resolvido">Resolvido</option>
                       <option value="cancelado">Cancelado</option>
                     </select>
-                  </td>
-                  <td><button type="button">Ver detalhes</button></td>
-                </tr>
-                <tr>
-                  <td>#1002</td>
-                  <td>Eduardo Ribeiro</td>
-                  <td>Encomenda de bolo sem lactose</td>
-                  <td>Vendas</td>
-                  <td>Média</td>
-                  <td><time datetime="2026-11-04">04/11/2026</time></td>
-                  <td>
-                    <select aria-label="Status do atendimento #1002">
+                    </td>
+                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
+                  </tr>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1002</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Eduardo Ribeiro</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Encomenda de bolo sem lactose</td>
+                    <td data-rotulo="Departamento">Vendas</td>
+                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--media">Média</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
+                    <td class="col-status" data-rotulo="Status">
+                    <select class="status-select status--aberto" aria-label="Status do atendimento #1002">
                       <option value="aberto" selected>Aberto</option>
                       <option value="em-andamento">Em andamento</option>
                       <option value="aguardando">Aguardando cliente</option>
                       <option value="resolvido">Resolvido</option>
                       <option value="cancelado">Cancelado</option>
                     </select>
-                  </td>
-                  <td><button type="button">Ver detalhes</button></td>
-                </tr>
-                <tr>
-                  <td>#1001</td>
-                  <td>Luciana Ferreira</td>
-                  <td>Segunda via do boleto mensal</td>
-                  <td>Financeiro</td>
-                  <td>Baixa</td>
-                  <td><time datetime="2026-11-01">01/11/2026</time></td>
-                  <td>
-                    <select aria-label="Status do atendimento #1001">
+                    </td>
+                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
+                  </tr>
+                  <tr>
+                    <td class="col-numero" data-rotulo="Nº">#1001</td>
+                    <td class="col-cliente" data-rotulo="Cliente">Luciana Ferreira</td>
+                    <td class="col-assunto" data-rotulo="Assunto">Segunda via do boleto mensal</td>
+                    <td data-rotulo="Departamento">Financeiro</td>
+                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--baixa">Baixa</span></td>
+                    <td data-rotulo="Abertura"><time datetime="2026-11-01">01/11/2026</time></td>
+                    <td class="col-status" data-rotulo="Status">
+                    <select class="status-select status--resolvido" aria-label="Status do atendimento #1001">
                       <option value="aberto">Aberto</option>
                       <option value="em-andamento">Em andamento</option>
                       <option value="aguardando">Aguardando cliente</option>
                       <option value="resolvido" selected>Resolvido</option>
                       <option value="cancelado">Cancelado</option>
                     </select>
-                  </td>
-                  <td><button type="button">Ver detalhes</button></td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <nav class="paginacao" aria-label="Paginação">
-              <button type="button" disabled>Anterior</button>
+              <button type="button" class="botao botao--secundario" disabled>Anterior</button>
               <p>Página 1 de 1</p>
-              <button type="button" disabled>Próxima</button>
+              <button type="button" class="botao botao--secundario" disabled>Próxima</button>
             </nav>
           </section>
         </section>
@@ -260,7 +290,7 @@
         <!-- ========== TELA 3: NOVO ATENDIMENTO ========== -->
         <section id="novo" class="tela">
           <h2>Novo atendimento</h2>
-          <p>Registre a solicitação do cliente. Todos os campos são obrigatórios.</p>
+          <p class="tela__intro">Registre a solicitação do cliente. Todos os campos são obrigatórios.</p>
 
           <!-- novalidate: a validação será feita pelo JavaScript, com mensagens próprias -->
           <form id="form-atendimento" class="bloco formulario" novalidate>
