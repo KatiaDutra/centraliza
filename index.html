@@ -294,52 +294,62 @@
 
           <!-- novalidate: a validação será feita pelo JavaScript, com mensagens próprias -->
           <form id="form-atendimento" class="bloco formulario" novalidate>
+            <div class="formulario__grade">
 
-            <div class="campo">
-              <label for="cliente">Nome do cliente</label>
-              <input type="text" id="cliente" name="cliente" maxlength="80" aria-describedby="erro-cliente">
-              <p class="campo__erro" id="erro-cliente"></p>
-            </div>
+              <div class="campo">
+                <label for="cliente">Nome do cliente</label>
+                <input type="text" id="cliente" name="cliente" maxlength="80" autocomplete="off" aria-describedby="erro-cliente">
+                <p class="campo__erro" id="erro-cliente"></p>
+              </div>
 
-            <div class="campo">
-              <label for="telefone">Telefone</label>
-              <input type="tel" id="telefone" name="telefone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" aria-describedby="erro-telefone">
-              <p class="campo__erro" id="erro-telefone"></p>
-            </div>
+              <div class="campo">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="off" aria-describedby="erro-telefone">
+                <p class="campo__erro" id="erro-telefone"></p>
+              </div>
 
-            <div class="campo">
-              <label for="departamento">Departamento responsável</label>
-              <select id="departamento" name="departamento" aria-describedby="erro-departamento">
-                <option value="">Selecione</option>
-                <option value="Vendas">Vendas</option>
-                <option value="Suporte">Suporte</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Entregas">Entregas</option>
-              </select>
-              <p class="campo__erro" id="erro-departamento"></p>
-            </div>
+              <div class="campo">
+                <label for="departamento">Departamento responsável</label>
+                <select id="departamento" name="departamento" aria-describedby="erro-departamento">
+                  <option value="">Selecione</option>
+                  <option value="Vendas">Vendas</option>
+                  <option value="Suporte">Suporte</option>
+                  <option value="Financeiro">Financeiro</option>
+                  <option value="Entregas">Entregas</option>
+                </select>
+                <p class="campo__erro" id="erro-departamento"></p>
+              </div>
 
-            <!-- fieldset + legend agrupam as opções de rádio com um título -->
-            <fieldset class="campo" id="grupo-prioridade" aria-describedby="erro-prioridade">
-              <legend>Prioridade</legend>
-              <label><input type="radio" name="prioridade" value="baixa"> Baixa</label>
-              <label><input type="radio" name="prioridade" value="media" checked> Média</label>
-              <label><input type="radio" name="prioridade" value="alta"> Alta</label>
-              <p class="campo__erro" id="erro-prioridade"></p>
-            </fieldset>
+              <!-- fieldset + legend agrupam as opções de rádio com um título.
+                   O <span> depois de cada rádio é o "botão" que aparece na tela. -->
+              <fieldset class="campo grupo-opcoes" id="grupo-prioridade" aria-describedby="erro-prioridade">
+                <legend>Prioridade</legend>
+                <div class="grupo-opcoes__itens">
+                  <label class="opcao"><input type="radio" name="prioridade" value="baixa"><span>Baixa</span></label>
+                  <label class="opcao"><input type="radio" name="prioridade" value="media" checked><span>Média</span></label>
+                  <label class="opcao opcao--alta"><input type="radio" name="prioridade" value="alta"><span>Alta</span></label>
+                </div>
+                <p class="campo__erro" id="erro-prioridade"></p>
+              </fieldset>
 
-            <div class="campo">
-              <label for="assunto">Assunto</label>
-              <span class="contador" id="contador-assunto">0/80</span>
-              <input type="text" id="assunto" name="assunto" maxlength="80" aria-describedby="erro-assunto">
-              <p class="campo__erro" id="erro-assunto"></p>
-            </div>
+              <div class="campo campo--largo">
+                <div class="campo__rotulo">
+                  <label for="assunto">Assunto</label>
+                  <span class="contador" id="contador-assunto">0/80</span>
+                </div>
+                <input type="text" id="assunto" name="assunto" maxlength="80" autocomplete="off" aria-describedby="erro-assunto">
+                <p class="campo__erro" id="erro-assunto"></p>
+              </div>
 
-            <div class="campo">
-              <label for="descricao">Descrição da solicitação</label>
-              <span class="contador" id="contador-descricao">0/500</span>
-              <textarea id="descricao" name="descricao" rows="5" maxlength="500" aria-describedby="erro-descricao"></textarea>
-              <p class="campo__erro" id="erro-descricao"></p>
+              <div class="campo campo--largo">
+                <div class="campo__rotulo">
+                  <label for="descricao">Descrição da solicitação</label>
+                  <span class="contador" id="contador-descricao">0/500</span>
+                </div>
+                <textarea id="descricao" name="descricao" rows="5" maxlength="500" aria-describedby="erro-descricao"></textarea>
+                <p class="campo__erro" id="erro-descricao"></p>
+              </div>
+
             </div>
 
             <p class="formulario__data">
@@ -347,8 +357,8 @@
             </p>
 
             <div class="formulario__acoes">
-              <button type="reset">Limpar campos</button>
-              <button type="submit">Registrar atendimento</button>
+              <button type="reset" class="botao botao--secundario">Limpar campos</button>
+              <button type="submit" class="botao botao--primario">Registrar atendimento</button>
             </div>
           </form>
         </section>
@@ -361,44 +371,56 @@
   <!-- <dialog> fica escondido até o JavaScript abrir.
        Para ver como ele fica agora, escreva "open" na tag: <dialog open ...> -->
   <dialog id="modal-detalhes" class="modal" aria-labelledby="detalhes-titulo">
-    <header>
-      <p>Atendimento #1003</p>
-      <h2 id="detalhes-titulo">Pacote de arroz rasgado</h2>
-      <button type="button">Fechar</button>
-    </header>
+    <div class="modal__caixa">
 
-    <dl class="detalhes__dados">
-      <div><dt>Cliente</dt><dd>Maria Silva</dd></div>
-      <div><dt>Telefone</dt><dd>(11) 98765-4321</dd></div>
-      <div><dt>Departamento</dt><dd>Suporte</dd></div>
-      <div><dt>Prioridade</dt><dd>Alta</dd></div>
-      <div><dt>Abertura</dt><dd>04/11/2026 às 09:31</dd></div>
-      <div><dt>Última atualização</dt><dd>04/11/2026 às 12:36</dd></div>
-    </dl>
+      <header class="detalhes__topo">
+        <div>
+          <p class="detalhes__numero">Atendimento #1003</p>
+          <h2 class="detalhes__titulo" id="detalhes-titulo">Pacote de arroz rasgado</h2>
+        </div>
+        <button type="button" class="botao botao--secundario" aria-label="Fechar detalhes">Fechar</button>
+      </header>
 
-    <section>
-      <h3>Descrição</h3>
-      <p>O pacote de arroz de 5 kg veio rasgado na entrega. A cliente quer a troca na próxima compra.</p>
-    </section>
+      <dl class="detalhes__dados">
+        <div><dt>Cliente</dt><dd>Maria Silva</dd></div>
+        <div><dt>Telefone</dt><dd>(11) 98765-4321</dd></div>
+        <div><dt>Departamento</dt><dd>Suporte</dd></div>
+        <div><dt>Prioridade</dt><dd><span class="prioridade prioridade--alta">Alta</span></dd></div>
+        <div><dt>Abertura</dt><dd>04/11/2026 às 09:31</dd></div>
+        <div><dt>Última atualização</dt><dd>04/11/2026 às 12:36</dd></div>
+      </dl>
 
-    <div class="campo">
-      <label for="detalhes-status">Status</label>
-      <select id="detalhes-status">
-        <option value="aberto">Aberto</option>
-        <option value="em-andamento" selected>Em andamento</option>
-        <option value="aguardando">Aguardando cliente</option>
-        <option value="resolvido">Resolvido</option>
-        <option value="cancelado">Cancelado</option>
-      </select>
+      <section class="detalhes__secao">
+        <h3 class="detalhes__subtitulo">Descrição</h3>
+        <p>O pacote de arroz de 5 kg veio rasgado na entrega. A cliente quer a troca na próxima compra.</p>
+      </section>
+
+      <div class="campo detalhes__status">
+        <label for="detalhes-status">Status</label>
+        <select class="status-select status--em-andamento" id="detalhes-status">
+          <option value="aberto">Aberto</option>
+          <option value="em-andamento" selected>Em andamento</option>
+          <option value="aguardando">Aguardando cliente</option>
+          <option value="resolvido">Resolvido</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+
+      <section class="detalhes__secao">
+        <h3 class="detalhes__subtitulo">Histórico de status</h3>
+        <ol class="linha-tempo">
+          <li class="status--em-andamento">
+            <span class="status status--em-andamento">Em andamento</span>
+            <time datetime="2026-11-04T12:36">04/11/2026 às 12:36</time>
+          </li>
+          <li class="status--aberto">
+            <span class="status status--aberto">Aberto</span>
+            <time datetime="2026-11-04T09:31">04/11/2026 às 09:31</time>
+          </li>
+        </ol>
+      </section>
+
     </div>
-
-    <section>
-      <h3>Histórico de status</h3>
-      <ol>
-        <li>Em andamento: <time datetime="2026-11-04T12:36">04/11/2026 às 12:36</time></li>
-        <li>Aberto: <time datetime="2026-11-04T09:31">04/11/2026 às 09:31</time></li>
-      </ol>
-    </section>
   </dialog>
 
 </body>

@@ -485,7 +485,9 @@
   }
 }
 
-/* ---------- Campos (o básico; o formulário completo vem no passo 4) ---------- */
+/* ---------- Campos ----------
+   Os :not() evitam que estas regras atinjam os botões de rádio
+   e o seletor colorido de status, que têm estilo próprio. */
 
 .campo {
   display: grid;
@@ -493,19 +495,182 @@
   gap: 6px;
 }
 
-.campo label {
+.campo label,
+.campo legend {
   font-size: 0.88rem;
   font-weight: 700;
 }
 
-.campo input,
-.campo select {
+.campo legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.campo input:not([type="radio"]),
+.campo select:not(.status-select),
+.campo textarea {
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid var(--borda-forte);
   border-radius: var(--raio-pequeno);
   background: var(--superficie);
+  transition: border-color 0.15s;
+}
+
+.campo input:not([type="radio"]):hover,
+.campo select:not(.status-select):hover,
+.campo textarea:hover {
+  border-color: var(--texto-suave);
+}
+
+.campo textarea {
+  min-height: 120px;
+  resize: vertical; /* deixa aumentar a altura, mas não a largura */
+}
+
+/* Rótulo e contador de caracteres na mesma linha */
+.campo__rotulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contador {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Erros de validação ----------
+   O JavaScript vai colocar aria-invalid="true" no campo errado
+   e escrever a mensagem no parágrafo .campo__erro. */
+
+.campo input[aria-invalid="true"],
+.campo select[aria-invalid="true"],
+.campo textarea[aria-invalid="true"] {
+  padding: 9px 11px; /* compensa a borda mais grossa, para o campo não "pular" */
+  border: 2px solid var(--aberto);
+}
+
+.campo__erro {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--aberto);
+}
+
+/* Parágrafo de erro vazio não ocupa espaço */
+.campo__erro:empty {
+  display: none;
+}
+
+/* ---------- Prioridade: rádios com cara de botões ----------
+   O rádio de verdade fica invisível por cima do <span>,
+   então o clique, o teclado e o leitor de tela continuam funcionando. */
+
+.grupo-opcoes {
+  min-width: 0;
+  padding: 0;
+  border: 0; /* tira a moldura padrão do fieldset */
+}
+
+.grupo-opcoes__itens {
+  display: flex;
+  gap: 8px;
+}
+
+.opcao {
+  position: relative;
+  flex: 1;
+}
+
+.opcao input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.opcao span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pequeno);
+  background: var(--superficie);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* "+" seleciona o elemento logo depois: o span do rádio marcado */
+.opcao input:checked + span {
+  border-color: var(--azul);
+  background: var(--em-andamento-fundo);
+  color: var(--em-andamento-texto);
+  font-weight: 800;
+}
+
+.opcao--alta input:checked + span {
+  border-color: var(--aberto);
+  background: var(--aberto-fundo);
+  color: var(--aberto-texto);
+}
+
+.opcao input:focus-visible + span {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}
+
+.grupo-opcoes[aria-invalid="true"] .opcao span {
+  border-color: var(--aberto);
+}
+
+/* ---------- Formulário ---------- */
+
+.formulario {
+  display: grid;
+  gap: 24px;
+}
+
+/* Celular: uma coluna */
+.formulario__grade {
+  display: grid;
+  gap: 20px;
+}
+
+.formulario__data {
+  padding: 12px 16px;
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+  font-size: 0.88rem;
+  color: var(--texto-suave);
+}
+
+/* Celular: botões empilhados, o principal em cima */
+.formulario__acoes {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .formulario__grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 24px;
+  }
+
+  .campo--largo {
+    grid-column: 1 / -1;
+  }
+
+  .formulario__acoes {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
 
 /* ---------- Filtros ---------- */
@@ -551,5 +716,141 @@
   gap: 12px;
   margin-top: 20px;
   font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* ---------- Modal de detalhes ---------- */
+
+.modal {
+  width: min(680px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio);
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: 0 24px 48px rgb(11 45 107 / 0.22);
+}
+
+/* ::backdrop é o fundo escurecido atrás do modal aberto */
+.modal::backdrop {
+  background: rgb(5 15 38 / 0.55);
+}
+
+.modal__caixa {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}
+
+.detalhes__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detalhes__numero {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.detalhes__titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+/* Celular: uma coluna. Telas maiores: duas. */
+.detalhes__dados {
+  display: grid;
+  gap: 14px 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda);
+}
+
+.detalhes__dados dt {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.detalhes__dados dd {
+  font-weight: 600;
+}
+
+.detalhes__secao {
+  display: grid;
+  gap: 8px;
+}
+
+.detalhes__subtitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.detalhes__status {
+  justify-items: start;
+}
+
+@media (min-width: 600px) {
+  .modal__caixa {
+    padding: 24px;
+  }
+
+  .detalhes__dados {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Linha do tempo do histórico ----------
+   Cada item tem uma linha vertical (::after) ligando ao próximo. */
+
+.linha-tempo li {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 0 0 14px 22px;
+}
+
+.linha-tempo li::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--s-cor);
+}
+
+.linha-tempo li::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+  left: 8px;
+  width: 2px;
+  background: var(--borda);
+}
+
+.linha-tempo li:last-child {
+  padding-bottom: 0;
+}
+
+.linha-tempo li:last-child::after {
+  display: none;
+}
+
+/* O selo dentro da linha do tempo não precisa da bolinha própria */
+.linha-tempo .status::before {
+  display: none;
+}
+
+.linha-tempo time {
+  font-size: 0.82rem;
   color: var(--texto-suave);
 }
