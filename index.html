@@ -64,40 +64,26 @@
             <dl class="indicadores">
               <div class="indicador">
                 <dt>Total de atendimentos</dt>
-                <dd>14</dd>
+                <dd id="ind-total">0</dd>
               </div>
               <div class="indicador indicador--aberto">
                 <dt>Em aberto</dt>
-                <dd>3</dd>
+                <dd id="ind-aberto">0</dd>
               </div>
               <div class="indicador indicador--em-andamento">
                 <dt>Em andamento</dt>
-                <dd>4</dd>
+                <dd id="ind-andamento">0</dd>
               </div>
               <div class="indicador indicador--resolvido">
                 <dt>Resolvidos</dt>
-                <dd>4</dd>
+                <dd id="ind-resolvido">0</dd>
               </div>
             </dl>
 
-            <!-- Barra com a proporção de cada status.
-                 Por enquanto os números estão fixos; depois o JavaScript calcula. -->
+            <!-- Barra com a proporção de cada status: o JavaScript preenche -->
             <div class="distribuicao">
-              <div class="distribuicao__barra" role="img"
-                   aria-label="Distribuição por status: Aberto 3, Em andamento 4, Aguardando cliente 2, Resolvido 4, Cancelado 1">
-                <span class="cor--aberto" style="flex-grow: 3"></span>
-                <span class="cor--em-andamento" style="flex-grow: 4"></span>
-                <span class="cor--aguardando" style="flex-grow: 2"></span>
-                <span class="cor--resolvido" style="flex-grow: 4"></span>
-                <span class="cor--cancelado" style="flex-grow: 1"></span>
-              </div>
-              <ul class="distribuicao__legenda">
-                <li><span class="marcador cor--aberto"></span>Aberto <strong>3</strong></li>
-                <li><span class="marcador cor--em-andamento"></span>Em andamento <strong>4</strong></li>
-                <li><span class="marcador cor--aguardando"></span>Aguardando cliente <strong>2</strong></li>
-                <li><span class="marcador cor--resolvido"></span>Resolvido <strong>4</strong></li>
-                <li><span class="marcador cor--cancelado"></span>Cancelado <strong>1</strong></li>
-              </ul>
+              <div class="distribuicao__barra" id="distribuicao-barra" role="img"></div>
+              <ul class="distribuicao__legenda" id="distribuicao-legenda"></ul>
             </div>
           </section>
 
@@ -107,47 +93,8 @@
               <a class="link" href="#atendimentos">Ver todos</a>
             </div>
 
-            <!-- data-rotulo: o nome da coluna, mostrado no celular quando a linha vira cartão -->
-            <div class="tabela-rolagem">
-              <table class="tabela">
-                <thead>
-                  <tr>
-                    <th scope="col">Nº</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Assunto</th>
-                    <th scope="col">Departamento</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Abertura</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1003</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Maria Silva</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Pacote de arroz rasgado</td>
-                    <td data-rotulo="Departamento">Suporte</td>
-                    <td class="col-status" data-rotulo="Status"><span class="status status--em-andamento">Em andamento</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
-                  </tr>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1002</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Eduardo Ribeiro</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Encomenda de bolo sem lactose</td>
-                    <td data-rotulo="Departamento">Vendas</td>
-                    <td class="col-status" data-rotulo="Status"><span class="status status--aberto">Aberto</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
-                  </tr>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1001</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Luciana Ferreira</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Segunda via do boleto mensal</td>
-                    <td data-rotulo="Departamento">Financeiro</td>
-                    <td class="col-status" data-rotulo="Status"><span class="status status--resolvido">Resolvido</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-01">01/11/2026</time></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <!-- O JavaScript desenha aqui a tabela dos atendimentos recentes -->
+            <div id="lista-recentes"></div>
           </section>
         </section>
 
@@ -203,82 +150,12 @@
           <!-- Listagem -->
           <section class="bloco" aria-labelledby="contagem">
             <div class="bloco__cabecalho">
-              <h3 class="bloco__titulo" id="contagem">3 atendimentos encontrados</h3>
+              <h3 class="bloco__titulo" id="contagem">Atendimentos</h3>
               <a class="botao botao--primario" href="#novo">Novo atendimento</a>
             </div>
 
-            <div class="tabela-rolagem">
-              <table class="tabela">
-                <thead>
-                  <tr>
-                    <th scope="col">Nº</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Assunto</th>
-                    <th scope="col">Departamento</th>
-                    <th scope="col">Prioridade</th>
-                    <th scope="col">Abertura</th>
-                    <th scope="col">Status</th>
-                    <th scope="col"><span class="visualmente-oculto">Ações</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1003</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Maria Silva</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Pacote de arroz rasgado</td>
-                    <td data-rotulo="Departamento">Suporte</td>
-                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--alta">Alta</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
-                    <td class="col-status" data-rotulo="Status">
-                    <select class="status-select status--em-andamento" aria-label="Status do atendimento #1003">
-                      <option value="aberto">Aberto</option>
-                      <option value="em-andamento" selected>Em andamento</option>
-                      <option value="aguardando">Aguardando cliente</option>
-                      <option value="resolvido">Resolvido</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
-                    </td>
-                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
-                  </tr>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1002</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Eduardo Ribeiro</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Encomenda de bolo sem lactose</td>
-                    <td data-rotulo="Departamento">Vendas</td>
-                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--media">Média</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-04">04/11/2026</time></td>
-                    <td class="col-status" data-rotulo="Status">
-                    <select class="status-select status--aberto" aria-label="Status do atendimento #1002">
-                      <option value="aberto" selected>Aberto</option>
-                      <option value="em-andamento">Em andamento</option>
-                      <option value="aguardando">Aguardando cliente</option>
-                      <option value="resolvido">Resolvido</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
-                    </td>
-                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
-                  </tr>
-                  <tr>
-                    <td class="col-numero" data-rotulo="Nº">#1001</td>
-                    <td class="col-cliente" data-rotulo="Cliente">Luciana Ferreira</td>
-                    <td class="col-assunto" data-rotulo="Assunto">Segunda via do boleto mensal</td>
-                    <td data-rotulo="Departamento">Financeiro</td>
-                    <td data-rotulo="Prioridade"><span class="prioridade prioridade--baixa">Baixa</span></td>
-                    <td data-rotulo="Abertura"><time datetime="2026-11-01">01/11/2026</time></td>
-                    <td class="col-status" data-rotulo="Status">
-                    <select class="status-select status--resolvido" aria-label="Status do atendimento #1001">
-                      <option value="aberto">Aberto</option>
-                      <option value="em-andamento">Em andamento</option>
-                      <option value="aguardando">Aguardando cliente</option>
-                      <option value="resolvido" selected>Resolvido</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
-                    </td>
-                    <td class="col-acoes"><button type="button" class="botao botao--texto">Ver detalhes</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <!-- O JavaScript desenha aqui a tabela com todos os atendimentos -->
+            <div id="lista-atendimentos"></div>
 
             <nav class="paginacao" aria-label="Paginação">
               <button type="button" class="botao botao--secundario" disabled>Anterior</button>

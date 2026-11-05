@@ -485,6 +485,27 @@
   }
 }
 
+/* ---------- Lista vazia ---------- */
+
+.vazio {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.vazio__titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.vazio .botao {
+  margin-top: 8px;
+}
+
 /* ---------- Campos ----------
    Os :not() evitam que estas regras atinjam os botões de rádio
    e o seletor colorido de status, que têm estilo próprio. */
