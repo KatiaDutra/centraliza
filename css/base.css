@@ -1,0 +1,114 @@
+/* ==========================================================
+   BASE: variáveis, reset, tipografia e acessibilidade
+   ========================================================== */
+
+/* ---------- 1. Variáveis (as cores e medidas do projeto) ----------
+   Definimos tudo aqui uma vez só. Se a paleta mudar,
+   basta trocar o valor nesta lista. */
+:root {
+  /* Paleta do brand board */
+  --azul-principal: #0B2D6B;
+  --azul: #2563EB;
+  --azul-escuro: #1E40AF;
+  --verde: #14B8A6;
+  --roxo: #8B5CF6;
+  --cinza: #F1F5F9;
+
+  /* Superfícies e texto */
+  --fundo: var(--cinza);
+  --superficie: #FFFFFF;
+  --borda: #E2E8F0;
+  --borda-forte: #CBD5E1;
+  --texto: #13254A;
+  --texto-suave: #55657F;
+  --sidebar-texto: #C9D6F2;
+
+  /* Forma e fonte */
+  --raio: 14px;
+  --raio-pequeno: 8px;
+  --fonte: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------- 2. Reset ----------
+   Os navegadores colocam margens e estilos próprios nos elementos.
+   Zeramos o que atrapalha para começar de uma base previsível. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* padding e borda entram na largura informada */
+}
+
+body, h1, h2, h3, p, dl, dd, ul, ol, fieldset {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Campos e botões não herdam a fonte da página por padrão */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- 3. Tipografia ---------- */
+body {
+  font-family: var(--fonte);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+a {
+  color: var(--azul);
+}
+
+/* ---------- 4. Acessibilidade ---------- */
+
+/* Contorno bem visível em quem recebe foco pelo teclado */
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}
+
+/* Link "Pular para o conteúdo": escondido até receber foco com Tab */
+.pular-conteudo {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--raio-pequeno);
+  background: var(--azul);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.pular-conteudo:focus {
+  top: 16px;
+}
+
+/* Quem pediu ao sistema menos animação não vê animações */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

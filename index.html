@@ -7,12 +7,19 @@
   <meta name="description" content="Centraliza: registre, acompanhe e consulte os atendimentos do seu comércio em um só lugar.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 
-  <!-- Passo 2: aqui entram a fonte e os arquivos CSS -->
+  <!-- Fonte do Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+
+  <!-- Estilos do projeto -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
   <!-- Passo 3: aqui entra o script JavaScript -->
 </head>
 <body>
   <!-- Link para quem navega pelo teclado pular direto para o conteúdo -->
-  <a href="#conteudo">Pular para o conteúdo</a>
+  <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
   <div class="app">
 
@@ -38,10 +45,6 @@
 
       <!-- ========== TOPO ========== -->
       <header class="topo">
-        <!-- Só aparece no celular; o JavaScript vai abrir e fechar o menu -->
-        <button type="button" class="topo__menu" aria-controls="sidebar" aria-expanded="false">
-          Menu
-        </button>
         <h1 class="topo__titulo">Início</h1>
         <button type="button" class="topo__tema">Tema escuro</button>
       </header>

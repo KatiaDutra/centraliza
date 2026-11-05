@@ -1,0 +1,166 @@
+/* ==========================================================
+   LAYOUT: estrutura geral, menu lateral e topo
+   Escrito "mobile first": primeiro o celular,
+   depois os ajustes para telas maiores com min-width.
+   ========================================================== */
+
+/* ---------- Celular (padrão) ---------- */
+
+.app {
+  min-height: 100vh;
+}
+
+/* No celular, o "menu lateral" fica no alto da página */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--azul-principal);
+  color: var(--sidebar-texto);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #FFFFFF;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+/* Os três links lado a lado; se não couberem, rolam para o lado */
+.menu {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.menu a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: var(--raio-pequeno);
+  color: var(--sidebar-texto);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.menu a:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: #FFFFFF;
+}
+
+/* A página atual fica destacada (o JavaScript vai trocar o aria-current depois) */
+.menu a[aria-current="page"] {
+  background: var(--azul);
+  color: #FFFFFF;
+}
+
+.sidebar__slogan {
+  display: none;
+}
+
+/* Topo com o título da tela */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.topo__titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* Área do conteúdo */
+main {
+  display: grid;
+  gap: 48px;
+  max-width: 1200px;
+  padding: 20px 16px 40px;
+}
+
+.tela {
+  display: grid;
+  gap: 16px;
+}
+
+/* Impede que uma tabela larga estoure a largura da tela */
+.tela > * {
+  min-width: 0;
+}
+
+/* ---------- Tablet (a partir de 768 px) ---------- */
+
+@media (min-width: 768px) {
+  .topo {
+    padding: 16px 24px;
+  }
+
+  main {
+    padding: 24px 24px 48px;
+  }
+
+  .tela {
+    gap: 24px;
+  }
+}
+
+/* ---------- Computador (a partir de 1024 px) ---------- */
+
+@media (min-width: 1024px) {
+  /* Duas colunas: menu fixo à esquerda e conteúdo à direita */
+  .app {
+    display: grid;
+    grid-template-columns: 252px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky; /* acompanha a rolagem da página */
+    top: 0;
+    height: 100vh;
+    gap: 32px;
+    padding: 24px 16px;
+  }
+
+  .logo {
+    padding: 4px 8px;
+    font-size: 1.4rem;
+  }
+
+  .menu {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .sidebar__slogan {
+    display: block;
+    margin-top: auto; /* empurra o slogan para o rodapé do menu */
+    padding: 0 8px;
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+
+  .topo {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 18px 40px;
+    background: var(--fundo);
+  }
+
+  .topo__titulo {
+    font-size: 1.6rem;
+  }
+
+  main {
+    padding: 28px 40px 56px;
+  }
+}
