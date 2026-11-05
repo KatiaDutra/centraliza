@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Centraliza | Gestão inteligente de atendimentos</title>
-  <meta name="description" content="Centraliza: registre, acompanhe e consulte os atendimentos do seu comércio em um só lugar.">
+  <meta name="description"
+    content="Centraliza: registre, acompanhe e consulte os atendimentos do seu comércio em um só lugar.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 
   <!-- Fonte do Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 
   <!-- Estilos do projeto -->
   <link rel="stylesheet" href="css/base.css">
@@ -33,6 +36,7 @@
   <!-- JavaScript: type="module" já espera a página carregar antes de rodar -->
   <script type="module" src="js/main.js"></script>
 </head>
+
 <body>
   <!-- Link para quem navega pelo teclado pular direto para o conteúdo -->
   <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
@@ -88,9 +92,17 @@
                 <dt>Em andamento</dt>
                 <dd id="ind-andamento">0</dd>
               </div>
+              <div class="indicador indicador--aguardando">
+                <dt>Aguardando cliente</dt>
+                <dd id="ind-aguardando">0</dd>
+              </div>
               <div class="indicador indicador--resolvido">
                 <dt>Resolvidos</dt>
                 <dd id="ind-resolvido">0</dd>
+              </div>
+              <div class="indicador indicador--cancelado">
+                <dt>Cancelados</dt>
+                <dd id="ind-cancelado">0</dd>
               </div>
             </dl>
 
@@ -158,7 +170,8 @@
               </select>
             </div>
 
-            <button type="button" class="botao botao--secundario filtros__limpar" id="limpar-filtros">Limpar filtros</button>
+            <button type="button" class="botao botao--secundario filtros__limpar" id="limpar-filtros">Limpar
+              filtros</button>
           </section>
 
           <!-- Listagem -->
@@ -187,13 +200,15 @@
 
               <div class="campo">
                 <label for="cliente">Nome do cliente</label>
-                <input type="text" id="cliente" name="cliente" maxlength="80" autocomplete="off" aria-describedby="erro-cliente">
+                <input type="text" id="cliente" name="cliente" maxlength="80" autocomplete="off"
+                  aria-describedby="erro-cliente">
                 <p class="campo__erro" id="erro-cliente"></p>
               </div>
 
               <div class="campo">
                 <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="off" aria-describedby="erro-telefone">
+                <input type="tel" id="telefone" name="telefone" inputmode="numeric" maxlength="15"
+                  placeholder="(00) 00000-0000" autocomplete="off" aria-describedby="erro-telefone">
                 <p class="campo__erro" id="erro-telefone"></p>
               </div>
 
@@ -215,8 +230,10 @@
                 <legend>Prioridade</legend>
                 <div class="grupo-opcoes__itens">
                   <label class="opcao"><input type="radio" name="prioridade" value="baixa"><span>Baixa</span></label>
-                  <label class="opcao"><input type="radio" name="prioridade" value="media" checked><span>Média</span></label>
-                  <label class="opcao opcao--alta"><input type="radio" name="prioridade" value="alta"><span>Alta</span></label>
+                  <label class="opcao"><input type="radio" name="prioridade" value="media"
+                      checked><span>Média</span></label>
+                  <label class="opcao opcao--alta"><input type="radio" name="prioridade"
+                      value="alta"><span>Alta</span></label>
                 </div>
                 <p class="campo__erro" id="erro-prioridade"></p>
               </fieldset>
@@ -226,7 +243,8 @@
                   <label for="assunto">Assunto</label>
                   <span class="contador" id="contador-assunto">0/80</span>
                 </div>
-                <input type="text" id="assunto" name="assunto" maxlength="80" autocomplete="off" aria-describedby="erro-assunto">
+                <input type="text" id="assunto" name="assunto" maxlength="80" autocomplete="off"
+                  aria-describedby="erro-assunto">
                 <p class="campo__erro" id="erro-assunto"></p>
               </div>
 
@@ -235,7 +253,8 @@
                   <label for="descricao">Descrição da solicitação</label>
                   <span class="contador" id="contador-descricao">0/500</span>
                 </div>
-                <textarea id="descricao" name="descricao" rows="5" maxlength="500" aria-describedby="erro-descricao"></textarea>
+                <textarea id="descricao" name="descricao" rows="5" maxlength="500"
+                  aria-describedby="erro-descricao"></textarea>
                 <p class="campo__erro" id="erro-descricao"></p>
               </div>
 
@@ -265,7 +284,8 @@
 
   <!-- ========== CONFIRMAÇÃO ========== -->
   <!-- method="dialog": o botão clicado fecha o modal e o seu value vira o returnValue -->
-  <dialog id="modal-confirmacao" class="modal modal--pequeno" aria-labelledby="confirmacao-titulo" aria-describedby="confirmacao-texto">
+  <dialog id="modal-confirmacao" class="modal modal--pequeno" aria-labelledby="confirmacao-titulo"
+    aria-describedby="confirmacao-texto">
     <form method="dialog" class="modal__caixa">
       <h2 class="modal__titulo" id="confirmacao-titulo"></h2>
       <p id="confirmacao-texto"></p>
@@ -280,4 +300,5 @@
   <div class="avisos" id="avisos" aria-live="polite"></div>
 
 </body>
+
 </html>

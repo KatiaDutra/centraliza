@@ -60,6 +60,8 @@ export function renderizarIndicadores(contagem) {
   document.getElementById('ind-aberto').textContent = contagem.aberto;
   document.getElementById('ind-andamento').textContent = contagem['em-andamento'];
   document.getElementById('ind-resolvido').textContent = contagem.resolvido;
+  document.getElementById('ind-aguardando').textContent = contagem.aguardando;
+  document.getElementById('ind-cancelado').textContent = contagem.cancelado;
 
   const barra = document.getElementById('distribuicao-barra');
   const legenda = document.getElementById('distribuicao-legenda');

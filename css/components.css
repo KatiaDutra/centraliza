@@ -217,7 +217,9 @@
 /* Bolinha colorida antes do nome de cada indicador de status */
 .indicador--aberto dt::before,
 .indicador--em-andamento dt::before,
-.indicador--resolvido dt::before {
+.indicador--aguardando dt::before,
+.indicador--resolvido dt::before,
+.indicador--cancelado dt::before {
   content: "";
   flex-shrink: 0;
   width: 10px;
@@ -227,23 +229,22 @@
 
 .indicador--aberto dt::before { background: var(--aberto); }
 .indicador--em-andamento dt::before { background: var(--em-andamento); }
+.indicador--aguardando dt::before { background: var(--aguardando); }
 .indicador--resolvido dt::before { background: var(--resolvido); }
+.indicador--cancelado dt::before { background: var(--cancelado); }
 
 @media (min-width: 768px) {
   .indicadores {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .indicador {
-    padding: 0 24px;
-  }
-
+  .indicador,
   .indicador:nth-child(odd) {
-    padding-left: 24px;
+    padding: 0 24px;
     border-left: 1px solid var(--borda);
   }
 
-  .indicador:first-child {
+  .indicador:nth-child(3n + 1) {
     padding-left: 0;
     border-left: 0;
   }
@@ -1032,5 +1033,21 @@
     bottom: 24px;
     left: auto;
     width: 380px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .indicadores {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .indicador:nth-child(3n + 1) {
+    padding-left: 24px;
+    border-left: 1px solid var(--borda);
+  }
+
+  .indicador:first-child {
+    padding-left: 0;
+    border-left: 0;
   }
 }
