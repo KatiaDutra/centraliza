@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Centraliza | Gestão inteligente de atendimentos</title>
+  <meta name="description" content="Centraliza: registre, acompanhe e consulte os atendimentos do seu comércio em um só lugar.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Passo 2: aqui entram a fonte e os arquivos CSS -->
+  <!-- Passo 3: aqui entra o script JavaScript -->
+</head>
+<body>
+  <!-- Link para quem navega pelo teclado pular direto para o conteúdo -->
+  <a href="#conteudo">Pular para o conteúdo</a>
+
+  <div class="app">
+
+    <!-- ========== MENU LATERAL ========== -->
+    <aside class="sidebar" id="sidebar">
+      <a class="logo" href="#inicio">
+        <img src="assets/centraliza-icone.svg" alt="" width="40" height="40">
+        <span>Centraliza</span>
+      </a>
+
+      <nav aria-label="Menu principal">
+        <ul class="menu">
+          <li><a href="#inicio" aria-current="page">Início</a></li>
+          <li><a href="#atendimentos">Atendimentos</a></li>
+          <li><a href="#novo">Novo atendimento</a></li>
+        </ul>
+      </nav>
+
+      <p class="sidebar__slogan">Gestão inteligente de atendimentos</p>
+    </aside>
+
+    <div class="principal">
+
+      <!-- ========== TOPO ========== -->
+      <header class="topo">
+        <!-- Só aparece no celular; o JavaScript vai abrir e fechar o menu -->
+        <button type="button" class="topo__menu" aria-controls="sidebar" aria-expanded="false">
+          Menu
+        </button>
+        <h1 class="topo__titulo">Início</h1>
+        <button type="button" class="topo__tema">Tema escuro</button>
+      </header>
+
+      <main id="conteudo">
+
+        <!-- ========== TELA 1: INÍCIO ========== -->
+        <section id="inicio" class="tela">
+          <h2>Início</h2>
+          <p>Acompanhe o andamento dos atendimentos do seu negócio.</p>
+
+          <!-- Indicadores: <dl> é a lista certa para pares "nome: valor" -->
+          <section class="painel" aria-labelledby="titulo-indicadores">
+            <h3 id="titulo-indicadores">Indicadores</h3>
+            <dl class="indicadores">
+              <div class="indicador">
+                <dt>Total de atendimentos</dt>
+                <dd>14</dd>
+              </div>
+              <div class="indicador">
+                <dt>Em aberto</dt>
+                <dd>3</dd>
+              </div>
+              <div class="indicador">
+                <dt>Em andamento</dt>
+                <dd>4</dd>
+              </div>
+              <div class="indicador">
+                <dt>Resolvidos</dt>
+                <dd>4</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="bloco" aria-labelledby="titulo-recentes">
+            <h3 id="titulo-recentes">Atendimentos recentes</h3>
+            <a href="#atendimentos">Ver todos</a>
+
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Nº</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Assunto</th>
+                  <th scope="col">Departamento</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Abertura</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#1003</td>
+                  <td>Maria Silva</td>
+                  <td>Pacote de arroz rasgado</td>
+                  <td>Suporte</td>
+                  <td><span class="status status--em-andamento">Em andamento</span></td>
+                  <td><time datetime="2026-11-04">04/11/2026</time></td>
+                </tr>
+                <tr>
+                  <td>#1002</td>
+                  <td>Eduardo Ribeiro</td>
+                  <td>Encomenda de bolo sem lactose</td>
+                  <td>Vendas</td>
+                  <td><span class="status status--aberto">Aberto</span></td>
+                  <td><time datetime="2026-11-04">04/11/2026</time></td>
+                </tr>
+                <tr>
+                  <td>#1001</td>
+                  <td>Luciana Ferreira</td>
+                  <td>Segunda via do boleto mensal</td>
+                  <td>Financeiro</td>
+                  <td><span class="status status--resolvido">Resolvido</span></td>
+                  <td><time datetime="2026-11-01">01/11/2026</time></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </section>
+
+        <!-- ========== TELA 2: ATENDIMENTOS ========== -->
+        <section id="atendimentos" class="tela">
+          <h2>Atendimentos</h2>
+
+          <!-- Pesquisa e filtros -->
+          <section class="bloco filtros" aria-labelledby="titulo-filtros">
+            <h3 id="titulo-filtros">Pesquisa e filtros</h3>
+
+            <div class="campo">
+              <label for="busca">Pesquisar</label>
+              <input type="search" id="busca" placeholder="Nome do cliente ou número">
+            </div>
+
+            <div class="campo">
+              <label for="filtro-departamento">Departamento</label>
+              <select id="filtro-departamento">
+                <option value="">Todos</option>
+                <option value="Vendas">Vendas</option>
+                <option value="Suporte">Suporte</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Entregas">Entregas</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="filtro-status">Status</label>
+              <select id="filtro-status">
+                <option value="">Todos</option>
+                <option value="aberto">Aberto</option>
+                <option value="em-andamento">Em andamento</option>
+                <option value="aguardando">Aguardando cliente</option>
+                <option value="resolvido">Resolvido</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="ordenacao">Ordenar por</label>
+              <select id="ordenacao">
+                <option value="recentes">Mais recentes</option>
+                <option value="antigos">Mais antigos</option>
+                <option value="prioridade">Prioridade (alta primeiro)</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+
+            <button type="button" id="limpar-filtros">Limpar filtros</button>
+          </section>
+
+          <!-- Listagem -->
+          <section class="bloco" aria-labelledby="contagem">
+            <h3 id="contagem">3 atendimentos encontrados</h3>
+            <a href="#novo">Novo atendimento</a>
+
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Nº</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Assunto</th>
+                  <th scope="col">Departamento</th>
+                  <th scope="col">Prioridade</th>
+                  <th scope="col">Abertura</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#1003</td>
+                  <td>Maria Silva</td>
+                  <td>Pacote de arroz rasgado</td>
+                  <td>Suporte</td>
+                  <td>Alta</td>
+                  <td><time datetime="2026-11-04">04/11/2026</time></td>
+                  <td>
+                    <select aria-label="Status do atendimento #1003">
+                      <option value="aberto">Aberto</option>
+                      <option value="em-andamento" selected>Em andamento</option>
+                      <option value="aguardando">Aguardando cliente</option>
+                      <option value="resolvido">Resolvido</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </td>
+                  <td><button type="button">Ver detalhes</button></td>
+                </tr>
+                <tr>
+                  <td>#1002</td>
+                  <td>Eduardo Ribeiro</td>
+                  <td>Encomenda de bolo sem lactose</td>
+                  <td>Vendas</td>
+                  <td>Média</td>
+                  <td><time datetime="2026-11-04">04/11/2026</time></td>
+                  <td>
+                    <select aria-label="Status do atendimento #1002">
+                      <option value="aberto" selected>Aberto</option>
+                      <option value="em-andamento">Em andamento</option>
+                      <option value="aguardando">Aguardando cliente</option>
+                      <option value="resolvido">Resolvido</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </td>
+                  <td><button type="button">Ver detalhes</button></td>
+                </tr>
+                <tr>
+                  <td>#1001</td>
+                  <td>Luciana Ferreira</td>
+                  <td>Segunda via do boleto mensal</td>
+                  <td>Financeiro</td>
+                  <td>Baixa</td>
+                  <td><time datetime="2026-11-01">01/11/2026</time></td>
+                  <td>
+                    <select aria-label="Status do atendimento #1001">
+                      <option value="aberto">Aberto</option>
+                      <option value="em-andamento">Em andamento</option>
+                      <option value="aguardando">Aguardando cliente</option>
+                      <option value="resolvido" selected>Resolvido</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </td>
+                  <td><button type="button">Ver detalhes</button></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <nav class="paginacao" aria-label="Paginação">
+              <button type="button" disabled>Anterior</button>
+              <p>Página 1 de 1</p>
+              <button type="button" disabled>Próxima</button>
+            </nav>
+          </section>
+        </section>
+
+        <!-- ========== TELA 3: NOVO ATENDIMENTO ========== -->
+        <section id="novo" class="tela">
+          <h2>Novo atendimento</h2>
+          <p>Registre a solicitação do cliente. Todos os campos são obrigatórios.</p>
+
+          <!-- novalidate: a validação será feita pelo JavaScript, com mensagens próprias -->
+          <form id="form-atendimento" class="bloco formulario" novalidate>
+
+            <div class="campo">
+              <label for="cliente">Nome do cliente</label>
+              <input type="text" id="cliente" name="cliente" maxlength="80" aria-describedby="erro-cliente">
+              <p class="campo__erro" id="erro-cliente"></p>
+            </div>
+
+            <div class="campo">
+              <label for="telefone">Telefone</label>
+              <input type="tel" id="telefone" name="telefone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" aria-describedby="erro-telefone">
+              <p class="campo__erro" id="erro-telefone"></p>
+            </div>
+
+            <div class="campo">
+              <label for="departamento">Departamento responsável</label>
+              <select id="departamento" name="departamento" aria-describedby="erro-departamento">
+                <option value="">Selecione</option>
+                <option value="Vendas">Vendas</option>
+                <option value="Suporte">Suporte</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Entregas">Entregas</option>
+              </select>
+              <p class="campo__erro" id="erro-departamento"></p>
+            </div>
+
+            <!-- fieldset + legend agrupam as opções de rádio com um título -->
+            <fieldset class="campo" id="grupo-prioridade" aria-describedby="erro-prioridade">
+              <legend>Prioridade</legend>
+              <label><input type="radio" name="prioridade" value="baixa"> Baixa</label>
+              <label><input type="radio" name="prioridade" value="media" checked> Média</label>
+              <label><input type="radio" name="prioridade" value="alta"> Alta</label>
+              <p class="campo__erro" id="erro-prioridade"></p>
+            </fieldset>
+
+            <div class="campo">
+              <label for="assunto">Assunto</label>
+              <span class="contador" id="contador-assunto">0/80</span>
+              <input type="text" id="assunto" name="assunto" maxlength="80" aria-describedby="erro-assunto">
+              <p class="campo__erro" id="erro-assunto"></p>
+            </div>
+
+            <div class="campo">
+              <label for="descricao">Descrição da solicitação</label>
+              <span class="contador" id="contador-descricao">0/500</span>
+              <textarea id="descricao" name="descricao" rows="5" maxlength="500" aria-describedby="erro-descricao"></textarea>
+              <p class="campo__erro" id="erro-descricao"></p>
+            </div>
+
+            <p class="formulario__data">
+              A data de abertura é registrada automaticamente ao salvar.
+            </p>
+
+            <div class="formulario__acoes">
+              <button type="reset">Limpar campos</button>
+              <button type="submit">Registrar atendimento</button>
+            </div>
+          </form>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========== DETALHES DO ATENDIMENTO ========== -->
+  <!-- <dialog> fica escondido até o JavaScript abrir.
+       Para ver como ele fica agora, escreva "open" na tag: <dialog open ...> -->
+  <dialog id="modal-detalhes" class="modal" aria-labelledby="detalhes-titulo">
+    <header>
+      <p>Atendimento #1003</p>
+      <h2 id="detalhes-titulo">Pacote de arroz rasgado</h2>
+      <button type="button">Fechar</button>
+    </header>
+
+    <dl class="detalhes__dados">
+      <div><dt>Cliente</dt><dd>Maria Silva</dd></div>
+      <div><dt>Telefone</dt><dd>(11) 98765-4321</dd></div>
+      <div><dt>Departamento</dt><dd>Suporte</dd></div>
+      <div><dt>Prioridade</dt><dd>Alta</dd></div>
+      <div><dt>Abertura</dt><dd>04/11/2026 às 09:31</dd></div>
+      <div><dt>Última atualização</dt><dd>04/11/2026 às 12:36</dd></div>
+    </dl>
+
+    <section>
+      <h3>Descrição</h3>
+      <p>O pacote de arroz de 5 kg veio rasgado na entrega. A cliente quer a troca na próxima compra.</p>
+    </section>
+
+    <div class="campo">
+      <label for="detalhes-status">Status</label>
+      <select id="detalhes-status">
+        <option value="aberto">Aberto</option>
+        <option value="em-andamento" selected>Em andamento</option>
+        <option value="aguardando">Aguardando cliente</option>
+        <option value="resolvido">Resolvido</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+
+    <section>
+      <h3>Histórico de status</h3>
+      <ol>
+        <li>Em andamento: <time datetime="2026-11-04T12:36">04/11/2026 às 12:36</time></li>
+        <li>Aberto: <time datetime="2026-11-04T09:31">04/11/2026 às 09:31</time></li>
+      </ol>
+    </section>
+  </dialog>
+
+</body>
+</html>
