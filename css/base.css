@@ -48,6 +48,12 @@ ol {
   list-style: none;
 }
 
+/* O atributo hidden precisa vencer qualquer display definido no CSS.
+   Sem isto, .tela { display: grid } faria as telas escondidas aparecerem. */
+[hidden] {
+  display: none !important;
+}
+
 img {
   display: block;
   max-width: 100%;

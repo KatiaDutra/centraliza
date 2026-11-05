@@ -87,6 +87,12 @@ main {
   padding: 20px 16px 40px;
 }
 
+/* O main recebe foco ao trocar de tela (para o leitor de tela),
+   mas não precisa mostrar contorno por isso */
+main:focus {
+  outline: none;
+}
+
 .tela {
   display: grid;
   gap: 16px;

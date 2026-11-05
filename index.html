@@ -16,7 +16,8 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
-  <!-- Passo 3: aqui entra o script JavaScript -->
+  <!-- JavaScript: type="module" já espera a página carregar antes de rodar -->
+  <script type="module" src="js/main.js"></script>
 </head>
 <body>
   <!-- Link para quem navega pelo teclado pular direto para o conteúdo -->
@@ -50,11 +51,11 @@
         <button type="button" class="botao botao--secundario topo__tema">Tema escuro</button>
       </header>
 
-      <main id="conteudo">
+      <main id="conteudo" tabindex="-1">
 
         <!-- ========== TELA 1: INÍCIO ========== -->
-        <section id="inicio" class="tela">
-          <h2>Início</h2>
+        <section class="tela" data-tela="inicio">
+          <h2 class="visualmente-oculto">Início</h2>
           <p class="tela__intro">Acompanhe o andamento dos atendimentos do seu negócio.</p>
 
           <!-- Indicadores: <dl> é a lista certa para pares "nome: valor" -->
@@ -151,8 +152,8 @@
         </section>
 
         <!-- ========== TELA 2: ATENDIMENTOS ========== -->
-        <section id="atendimentos" class="tela">
-          <h2>Atendimentos</h2>
+        <section class="tela" data-tela="atendimentos">
+          <h2 class="visualmente-oculto">Atendimentos</h2>
 
           <!-- Pesquisa e filtros -->
           <section class="bloco filtros" aria-labelledby="titulo-filtros">
@@ -288,8 +289,8 @@
         </section>
 
         <!-- ========== TELA 3: NOVO ATENDIMENTO ========== -->
-        <section id="novo" class="tela">
-          <h2>Novo atendimento</h2>
+        <section class="tela" data-tela="novo">
+          <h2 class="visualmente-oculto">Novo atendimento</h2>
           <p class="tela__intro">Registre a solicitação do cliente. Todos os campos são obrigatórios.</p>
 
           <!-- novalidate: a validação será feita pelo JavaScript, com mensagens próprias -->
