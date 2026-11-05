@@ -5,7 +5,8 @@
    ========================================================== */
 
 import { STATUS, ORDEM_STATUS, PRIORIDADES } from './config.js';
-import { escaparHtml, formatarData } from './utils.js';
+import { escaparHtml, formatarData, formatarDataHora, apenasDigitos, descreverEspera } from './utils.js';
+import { diasEmEspera } from './atendimentos.js';
 
 /* ---------- Peças pequenas ---------- */
 
@@ -17,19 +18,30 @@ function seloPrioridade(prioridade) {
   return `<span class="prioridade prioridade--${prioridade}">${PRIORIDADES[prioridade].rotulo}</span>`;
 }
 
-/** O seletor de status de uma linha, com o status atual já marcado. */
-function seletorStatus(atendimento) {
+/**
+ * O seletor de status, com o status atual já marcado.
+ * "local" diz onde ele está (lista ou detalhes): ajuda a devolver o foco
+ * ao seletor certo depois que a tela é redesenhada.
+ */
+function seletorStatus(atendimento, local = 'lista', id = '') {
   const opcoes = ORDEM_STATUS.map((status) => {
     const marcado = status === atendimento.status ? ' selected' : '';
     return `<option value="${status}"${marcado}>${STATUS[status].rotulo}</option>`;
   }).join('');
 
   return `
-    <select class="status-select status--${atendimento.status}"
-            data-id="${atendimento.id}"
+    <select class="status-select status--${atendimento.status}" ${id ? `id="${id}"` : ''}
+            data-id="${atendimento.id}" data-local="${local}"
             aria-label="Status do atendimento #${atendimento.id}">
       ${opcoes}
     </select>`;
+}
+
+function botaoDetalhes(atendimento) {
+  return `
+    <button type="button" class="botao botao--texto" data-acao="detalhes" data-id="${atendimento.id}">
+      Ver detalhes<span class="visualmente-oculto"> do atendimento #${atendimento.id}</span>
+    </button>`;
 }
 
 /* ---------- Indicadores e barra de distribuição ---------- */
@@ -99,6 +111,7 @@ export function renderizarRecentes(container, atendimentos) {
       <td data-rotulo="Departamento">${escaparHtml(atendimento.departamento)}</td>
       <td class="col-status" data-rotulo="Status">${seloStatus(atendimento.status)}</td>
       <td data-rotulo="Abertura"><time datetime="${atendimento.dataAbertura}">${formatarData(atendimento.dataAbertura)}</time></td>
+      <td class="col-acoes">${botaoDetalhes(atendimento)}</td>
     </tr>
   `).join('');
 
@@ -113,6 +126,7 @@ export function renderizarRecentes(container, atendimentos) {
             <th scope="col">Departamento</th>
             <th scope="col">Status</th>
             <th scope="col">Abertura</th>
+            <th scope="col"><span class="visualmente-oculto">Ações</span></th>
           </tr>
         </thead>
         <tbody>${linhas}</tbody>
@@ -136,11 +150,7 @@ export function renderizarLista(container, atendimentos, temFiltro) {
       <td data-rotulo="Prioridade">${seloPrioridade(atendimento.prioridade)}</td>
       <td data-rotulo="Abertura"><time datetime="${atendimento.dataAbertura}">${formatarData(atendimento.dataAbertura)}</time></td>
       <td class="col-status" data-rotulo="Status">${seletorStatus(atendimento)}</td>
-      <td class="col-acoes">
-        <button type="button" class="botao botao--texto" data-acao="detalhes" data-id="${atendimento.id}">
-          Ver detalhes<span class="visualmente-oculto"> do atendimento #${atendimento.id}</span>
-        </button>
-      </td>
+      <td class="col-acoes">${botaoDetalhes(atendimento)}</td>
     </tr>
   `).join('');
 
@@ -162,6 +172,89 @@ export function renderizarLista(container, atendimentos, temFiltro) {
         <tbody>${linhas}</tbody>
       </table>
     </div>`;
+}
+
+/* ---------- Detalhes do atendimento ---------- */
+
+/** Link do WhatsApp com o número do cliente e uma mensagem pronta. */
+function linkWhatsApp(atendimento) {
+  const primeiroNome = atendimento.cliente.split(' ')[0];
+  const mensagem = `Olá, ${primeiroNome}! Aqui é da equipe de atendimento, sobre a sua solicitação #${atendimento.id}: ${atendimento.assunto}.`;
+  // encodeURIComponent troca espaços e acentos por códigos que podem ir num link
+  return `https://wa.me/55${apenasDigitos(atendimento.telefone)}?text=${encodeURIComponent(mensagem)}`;
+}
+
+export function renderizarDetalhes(container, atendimento) {
+  const dias = diasEmEspera(atendimento);
+  const espera = dias === null ? 'Encerrado' : descreverEspera(dias);
+
+  // Histórico do mais novo para o mais antigo
+  const historico = [...atendimento.historico].reverse().map((registro) => `
+    <li class="status--${registro.status}">
+      ${seloStatus(registro.status)}
+      <time datetime="${registro.data}">${formatarDataHora(registro.data)}</time>
+    </li>
+  `).join('');
+
+  container.innerHTML = `
+    <header class="detalhes__topo">
+      <div>
+        <p class="detalhes__numero">Atendimento #${atendimento.id}</p>
+        <h2 class="detalhes__titulo" id="detalhes-titulo">${escaparHtml(atendimento.assunto)}</h2>
+      </div>
+      <button type="button" class="botao botao--secundario" data-fechar-modal>Fechar</button>
+    </header>
+
+    <dl class="detalhes__dados">
+      <div><dt>Cliente</dt><dd>${escaparHtml(atendimento.cliente)}</dd></div>
+      <div><dt>Telefone</dt><dd>${escaparHtml(atendimento.telefone)}</dd></div>
+      <div><dt>Departamento</dt><dd>${escaparHtml(atendimento.departamento)}</dd></div>
+      <div><dt>Prioridade</dt><dd>${seloPrioridade(atendimento.prioridade)}</dd></div>
+      <div><dt>Abertura</dt><dd>${formatarDataHora(atendimento.dataAbertura)}</dd></div>
+      <div><dt>Última atualização</dt><dd>${formatarDataHora(atendimento.ultimaAtualizacao)}</dd></div>
+      <div><dt>Tempo de espera</dt><dd>${espera}</dd></div>
+    </dl>
+
+    <section class="detalhes__secao">
+      <h3 class="detalhes__subtitulo">Descrição</h3>
+      <p class="detalhes__descricao">${escaparHtml(atendimento.descricao)}</p>
+    </section>
+
+    <div class="detalhes__acoes">
+      <div class="campo">
+        <label for="detalhes-status">Status</label>
+        ${seletorStatus(atendimento, 'detalhes', 'detalhes-status')}
+      </div>
+      <a class="botao botao--whatsapp" href="${linkWhatsApp(atendimento)}" target="_blank" rel="noopener noreferrer">
+        Conversar no WhatsApp
+      </a>
+    </div>
+
+    <section class="detalhes__secao">
+      <h3 class="detalhes__subtitulo">Histórico de status</h3>
+      <ol class="linha-tempo">${historico}</ol>
+    </section>`;
+}
+
+/* ---------- Confirmação ---------- */
+
+/**
+ * Abre o modal de confirmação e espera a resposta.
+ * Devolve uma Promise: true se a pessoa confirmou, false se voltou ou apertou Esc.
+ */
+export function confirmar({ titulo, mensagem, textoConfirmar }) {
+  const modal = document.getElementById('modal-confirmacao');
+  document.getElementById('confirmacao-titulo').textContent = titulo;
+  document.getElementById('confirmacao-texto').textContent = mensagem;
+  document.getElementById('confirmacao-botao').textContent = textoConfirmar;
+
+  modal.returnValue = '';
+  modal.showModal();
+
+  return new Promise((resolver) => {
+    // O botão clicado define o returnValue (value="confirmar" ou "voltar")
+    modal.addEventListener('close', () => resolver(modal.returnValue === 'confirmar'), { once: true });
+  });
 }
 
 /* ---------- Paginação ---------- */
@@ -216,6 +309,11 @@ export function mostrarErrosFormulario(formulario, erros) {
  */
 export function mostrarAviso(mensagem, tipo = 'sucesso') {
   const area = document.getElementById('avisos');
+
+  // Um <dialog> aberto fica por cima de tudo na página. Para o aviso não ficar
+  // escondido atrás dele, a área de avisos vai para dentro do modal aberto.
+  const modalAberto = document.querySelector('dialog[open]');
+  (modalAberto ?? document.body).append(area);
 
   // Um sucesso torna os avisos de erro anteriores desatualizados: tira da tela
   if (tipo === 'sucesso') {

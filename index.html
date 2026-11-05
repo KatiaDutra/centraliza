@@ -244,59 +244,22 @@
   </div>
 
   <!-- ========== DETALHES DO ATENDIMENTO ========== -->
-  <!-- <dialog> fica escondido até o JavaScript abrir.
-       Para ver como ele fica agora, escreva "open" na tag: <dialog open ...> -->
+  <!-- O JavaScript desenha o conteúdo e abre o modal com showModal() -->
   <dialog id="modal-detalhes" class="modal" aria-labelledby="detalhes-titulo">
-    <div class="modal__caixa">
+    <div class="modal__caixa" id="detalhes-conteudo"></div>
+  </dialog>
 
-      <header class="detalhes__topo">
-        <div>
-          <p class="detalhes__numero">Atendimento #1003</p>
-          <h2 class="detalhes__titulo" id="detalhes-titulo">Pacote de arroz rasgado</h2>
-        </div>
-        <button type="button" class="botao botao--secundario" aria-label="Fechar detalhes">Fechar</button>
-      </header>
-
-      <dl class="detalhes__dados">
-        <div><dt>Cliente</dt><dd>Maria Silva</dd></div>
-        <div><dt>Telefone</dt><dd>(11) 98765-4321</dd></div>
-        <div><dt>Departamento</dt><dd>Suporte</dd></div>
-        <div><dt>Prioridade</dt><dd><span class="prioridade prioridade--alta">Alta</span></dd></div>
-        <div><dt>Abertura</dt><dd>04/11/2026 às 09:31</dd></div>
-        <div><dt>Última atualização</dt><dd>04/11/2026 às 12:36</dd></div>
-      </dl>
-
-      <section class="detalhes__secao">
-        <h3 class="detalhes__subtitulo">Descrição</h3>
-        <p>O pacote de arroz de 5 kg veio rasgado na entrega. A cliente quer a troca na próxima compra.</p>
-      </section>
-
-      <div class="campo detalhes__status">
-        <label for="detalhes-status">Status</label>
-        <select class="status-select status--em-andamento" id="detalhes-status">
-          <option value="aberto">Aberto</option>
-          <option value="em-andamento" selected>Em andamento</option>
-          <option value="aguardando">Aguardando cliente</option>
-          <option value="resolvido">Resolvido</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
+  <!-- ========== CONFIRMAÇÃO ========== -->
+  <!-- method="dialog": o botão clicado fecha o modal e o seu value vira o returnValue -->
+  <dialog id="modal-confirmacao" class="modal modal--pequeno" aria-labelledby="confirmacao-titulo" aria-describedby="confirmacao-texto">
+    <form method="dialog" class="modal__caixa">
+      <h2 class="modal__titulo" id="confirmacao-titulo"></h2>
+      <p id="confirmacao-texto"></p>
+      <div class="modal__acoes">
+        <button type="submit" value="voltar" class="botao botao--secundario" autofocus>Voltar</button>
+        <button type="submit" value="confirmar" class="botao botao--perigo" id="confirmacao-botao">Confirmar</button>
       </div>
-
-      <section class="detalhes__secao">
-        <h3 class="detalhes__subtitulo">Histórico de status</h3>
-        <ol class="linha-tempo">
-          <li class="status--em-andamento">
-            <span class="status status--em-andamento">Em andamento</span>
-            <time datetime="2026-11-04T12:36">04/11/2026 às 12:36</time>
-          </li>
-          <li class="status--aberto">
-            <span class="status status--aberto">Aberto</span>
-            <time datetime="2026-11-04T09:31">04/11/2026 às 09:31</time>
-          </li>
-        </ol>
-      </section>
-
-    </div>
+    </form>
   </dialog>
 
   <!-- Avisos que aparecem no canto da tela. aria-live faz o leitor de tela anunciar. -->

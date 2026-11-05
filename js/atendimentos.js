@@ -6,7 +6,7 @@
    ========================================================== */
 
 import { STATUS, ORDEM_STATUS, PRIORIDADES, DEPARTAMENTOS, LIMITES } from './config.js';
-import { apenasDigitos, formatarTelefone, normalizarTexto } from './utils.js';
+import { apenasDigitos, formatarTelefone, normalizarTexto, diasDesde } from './utils.js';
 
 /* ---------- Validação e criação ---------- */
 
@@ -77,6 +77,34 @@ export function criarAtendimento(dados, id, agora = new Date()) {
     ultimaAtualizacao: dataAtual,
     historico: [{ status: 'aberto', data: dataAtual }],
   };
+}
+
+/* ---------- Status ---------- */
+
+/**
+ * Devolve uma CÓPIA do atendimento com o novo status,
+ * a data da alteração e um registro a mais no histórico.
+ * O original não é alterado.
+ */
+export function alterarStatus(atendimento, novoStatus, agora = new Date()) {
+  if (!STATUS[novoStatus]) {
+    throw new Error(`Status desconhecido: ${novoStatus}`);
+  }
+
+  const dataAtual = agora.toISOString();
+
+  return {
+    ...atendimento, // copia todos os campos...
+    status: novoStatus, // ...e substitui estes
+    ultimaAtualizacao: dataAtual,
+    historico: [...atendimento.historico, { status: novoStatus, data: dataAtual }],
+  };
+}
+
+/** Dias em espera de um atendimento ainda não encerrado. Encerrado devolve null. */
+export function diasEmEspera(atendimento, agora = new Date()) {
+  if (STATUS[atendimento.status].final) return null;
+  return diasDesde(atendimento.dataAbertura, agora);
 }
 
 /* ---------- Leitura e indicadores ---------- */

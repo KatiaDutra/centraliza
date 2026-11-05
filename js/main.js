@@ -5,18 +5,18 @@
    e o desenho em ui.js.
    ========================================================== */
 
-import { QUANTIDADE_RECENTES, LIMITES, ORDENACOES, ITENS_POR_PAGINA } from './config.js';
+import { STATUS, QUANTIDADE_RECENTES, LIMITES, ORDENACOES, ITENS_POR_PAGINA } from './config.js';
 import { formatarTelefone, formatarDataHora } from './utils.js';
 import { carregarAtendimentos, salvarAtendimentos, reservarProximoId } from './storage.js';
 import { gerarAtendimentosExemplo } from './exemplos.js';
 import {
   validarAtendimento, criarAtendimento,
   filtrarRegistrosValidos, calcularIndicadores, obterRecentes,
-  filtrarAtendimentos, ordenarAtendimentos, paginar,
+  filtrarAtendimentos, ordenarAtendimentos, paginar, alterarStatus,
 } from './atendimentos.js';
 import {
   renderizarIndicadores, renderizarRecentes, renderizarLista, renderizarPaginacao,
-  mostrarErrosFormulario, mostrarAviso,
+  mostrarErrosFormulario, mostrarAviso, renderizarDetalhes, confirmar,
 } from './ui.js';
 
 /* ---------- Estado: os dados que a aplicação está usando ---------- */
@@ -26,6 +26,7 @@ const estado = {
   filtros: { texto: '', departamento: '', status: '' },
   ordenacao: 'recentes', // chave de ORDENACOES
   pagina: 1,
+  detalhesAbertos: null, // id do atendimento aberto no modal, ou null
 };
 
 /* ---------- Dados ---------- */
@@ -80,13 +81,34 @@ function atualizarLista() {
     total === 1 ? '1 atendimento encontrado' : `${total} atendimentos encontrados`;
 }
 
-/** Redesenha tudo o que depende dos dados. */
-function atualizarTela() {
-  const { atendimentos } = estado;
+function buscarAtendimento(id) {
+  return estado.atendimentos.find((atendimento) => atendimento.id === id);
+}
 
+/**
+ * Redesenha tudo o que depende dos dados.
+ * Redesenhar troca os elementos da tela por novos; se o foco estava
+ * num seletor de status, devolvemos o foco ao seletor novo equivalente.
+ */
+function atualizarTela() {
+  const focado = document.activeElement;
+  const seletorFocado = focado?.classList.contains('status-select')
+    ? { id: focado.dataset.id, local: focado.dataset.local }
+    : null;
+
+  const { atendimentos } = estado;
   renderizarIndicadores(calcularIndicadores(atendimentos));
   renderizarRecentes(document.getElementById('lista-recentes'), obterRecentes(atendimentos, QUANTIDADE_RECENTES));
   atualizarLista();
+
+  // Se o modal está aberto, redesenha também os detalhes
+  if (estado.detalhesAbertos !== null) {
+    renderizarDetalhes(conteudoDetalhes, buscarAtendimento(estado.detalhesAbertos));
+  }
+
+  if (seletorFocado) {
+    document.querySelector(`.status-select[data-id="${seletorFocado.id}"][data-local="${seletorFocado.local}"]`)?.focus();
+  }
 }
 
 /* ---------- Navegação entre as telas (passo 5) ---------- */
@@ -200,6 +222,80 @@ document.getElementById('paginacao').addEventListener('click', (evento) => {
   estado.pagina = Number(botao.dataset.pagina);
   atualizarLista();
   document.getElementById('contagem').scrollIntoView({ block: 'start' });
+});
+
+/* ---------- Mudança de status ---------- */
+
+async function mudarStatus(id, novoStatus) {
+  const atual = buscarAtendimento(id);
+  if (!atual || atual.status === novoStatus) return;
+
+  // Cancelar pede confirmação. "await" espera a resposta do modal.
+  if (novoStatus === 'cancelado') {
+    const confirmou = await confirmar({
+      titulo: `Cancelar o atendimento #${id}?`,
+      mensagem: 'O atendimento será encerrado sem solução. Se precisar, você pode mudar o status de novo depois.',
+      textoConfirmar: 'Cancelar atendimento',
+    });
+
+    if (!confirmou) {
+      atualizarTela(); // redesenha para o seletor voltar ao status anterior
+      return;
+    }
+  }
+
+  // Troca o atendimento antigo pela cópia atualizada
+  const atualizado = alterarStatus(atual, novoStatus);
+  estado.atendimentos = estado.atendimentos.map((atendimento) => (atendimento.id === id ? atualizado : atendimento));
+
+  persistir();
+  atualizarTela();
+  mostrarAviso(`Atendimento #${id} agora está como "${STATUS[novoStatus].rotulo}".`);
+}
+
+/* ---------- Modal de detalhes ---------- */
+
+const modalDetalhes = document.getElementById('modal-detalhes');
+const conteudoDetalhes = document.getElementById('detalhes-conteudo');
+
+function abrirDetalhes(id) {
+  const atendimento = buscarAtendimento(id);
+  if (!atendimento) return;
+
+  estado.detalhesAbertos = id;
+  renderizarDetalhes(conteudoDetalhes, atendimento);
+  modalDetalhes.showModal(); // showModal: abre com fundo escurecido e fecha com Esc
+  conteudoDetalhes.querySelector('[data-fechar-modal]').focus();
+}
+
+modalDetalhes.addEventListener('click', (evento) => {
+  // Clique no fundo escurecido (fora da caixa) ou no botão "Fechar"
+  if (evento.target === modalDetalhes || evento.target.closest('[data-fechar-modal]')) {
+    modalDetalhes.close();
+  }
+});
+
+// Ao fechar (por botão, clique fora ou Esc), devolve o foco ao "Ver detalhes" que abriu
+modalDetalhes.addEventListener('close', () => {
+  const id = estado.detalhesAbertos;
+  estado.detalhesAbertos = null;
+
+  const telaVisivel = document.querySelector('[data-tela]:not([hidden])');
+  telaVisivel?.querySelector(`[data-acao="detalhes"][data-id="${id}"]`)?.focus();
+});
+
+/* ---------- Eventos das tabelas (delegação no documento inteiro) ---------- */
+
+// Qualquer "Ver detalhes", na tela Início ou na tela Atendimentos
+document.addEventListener('click', (evento) => {
+  const botao = evento.target.closest('[data-acao="detalhes"]');
+  if (botao) abrirDetalhes(Number(botao.dataset.id));
+});
+
+// Qualquer seletor de status, na lista ou no modal
+document.addEventListener('change', (evento) => {
+  const seletor = evento.target.closest('.status-select');
+  if (seletor) mudarStatus(Number(seletor.dataset.id), seletor.value);
 });
 
 /* ---------- Formulário de cadastro ---------- */

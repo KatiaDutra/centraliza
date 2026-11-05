@@ -3,6 +3,8 @@
    Funções pequenas de texto e data, usadas em vários lugares.
    ========================================================== */
 
+const MILISSEGUNDOS_POR_DIA = 24 * 60 * 60 * 1000;
+
 const formatoData = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
   month: '2-digit',
@@ -37,6 +39,19 @@ export function normalizarTexto(texto) {
     .replace(/[\u0300-\u036f]/g, '')   // apaga os acentos soltos
     .toLowerCase()
     .trim();
+}
+
+/** Quantos dias completos se passaram desde a data informada. */
+export function diasDesde(dataIso, agora = new Date()) {
+  const diferenca = agora.getTime() - new Date(dataIso).getTime();
+  return Math.max(0, Math.floor(diferenca / MILISSEGUNDOS_POR_DIA));
+}
+
+/** 0 → "Aberto hoje", 1 → "Em espera há 1 dia", 5 → "Em espera há 5 dias" */
+export function descreverEspera(dias) {
+  if (dias === 0) return 'Aberto hoje';
+  if (dias === 1) return 'Em espera há 1 dia';
+  return `Em espera há ${dias} dias`;
 }
 
 /** Tira tudo o que não for número: "(11) 98765-4321" vira "11987654321" */

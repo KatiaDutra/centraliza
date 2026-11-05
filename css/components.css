@@ -83,6 +83,25 @@
   background: var(--em-andamento-fundo);
 }
 
+.botao--perigo {
+  background: var(--aberto);
+  color: #FFFFFF;
+}
+
+.botao--perigo:hover {
+  background: var(--aberto-texto);
+}
+
+.botao--whatsapp {
+  background: var(--superficie);
+  border-color: var(--verde);
+  color: var(--resolvido-texto);
+}
+
+.botao--whatsapp:hover {
+  background: var(--resolvido-fundo);
+}
+
 .botao:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -816,8 +835,35 @@
   font-weight: 700;
 }
 
-.detalhes__status {
-  justify-items: start;
+.detalhes__descricao {
+  white-space: pre-line;    /* respeita as quebras de linha digitadas */
+  overflow-wrap: anywhere;  /* quebra palavras muito longas em vez de estourar */
+}
+
+/* Status e botão do WhatsApp lado a lado (ou empilhados, se não couber) */
+.detalhes__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Modal de confirmação, mais estreito */
+.modal--pequeno {
+  width: min(440px, calc(100% - 32px));
+}
+
+.modal__titulo {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.modal__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 @media (min-width: 600px) {
