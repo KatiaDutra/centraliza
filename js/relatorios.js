@@ -4,7 +4,7 @@
    Nada aqui mexe na tela, então dá para testar no console.
    ========================================================== */
 
-import { STATUS, ORDEM_STATUS, DEPARTAMENTOS, DIAS_PARA_ALERTA } from './config.js';
+import { STATUS, ORDEM_STATUS, PRIORIDADES, DEPARTAMENTOS, DIAS_PARA_ALERTA } from './config.js';
 import { chaveDia, apenasDigitos, normalizarTexto } from './utils.js';
 import { diasEmEspera } from './atendimentos.js';
 
@@ -171,3 +171,98 @@ export function agruparPorCliente(atendimentos) {
     b.total - a.total || b.ultimo.localeCompare(a.ultimo)
   );
 }
+
+/* ---------- Gráfico por dia ---------- */
+
+/** "2026-11-05" vira um Date no fuso local (new Date("2026-11-05") usaria UTC e voltaria um dia). */
+function dataDaChave(chave) {
+  const [ano, mes, dia] = chave.split('-').map(Number);
+  return new Date(ano, mes - 1, dia);
+}
+
+/**
+ * A tabela "Por dia" só tem os dias com movimento.
+ * O gráfico precisa de todos os dias entre o primeiro e o último,
+ * com zero nos dias parados, senão o eixo do tempo fica enganoso.
+ */
+export function preencherDias(porDia) {
+  if (porDia.length === 0) return [];
+
+  const existentes = new Map(porDia.map((linha) => [linha.dia, linha]));
+  const ultimo = porDia[porDia.length - 1].dia;
+  const resultado = [];
+
+  for (let data = dataDaChave(porDia[0].dia); ; data.setDate(data.getDate() + 1)) {
+    const dia = chaveDia(data.toISOString());
+    resultado.push(existentes.get(dia) ?? { dia, abertos: 0, resolvidos: 0 });
+    if (dia === ultimo) break;
+  }
+
+  return resultado;
+}
+
+/* ---------- Exportação para CSV ---------- */
+
+const formatoDataHoraCsv = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+});
+
+/** "05/11/2026 14:30" (sem a vírgula, que o Excel confundiria) */
+function dataHoraCsv(dataIso) {
+  return dataIso ? formatoDataHoraCsv.format(new Date(dataIso)).replace(',', '') : '';
+}
+
+/**
+ * Prepara um valor para uma célula do CSV.
+ * Se tiver ponto e vírgula, aspas ou quebra de linha, vai entre aspas,
+ * e as aspas de dentro viram duas ("" é como o CSV escreve uma aspa).
+ */
+function celula(valor) {
+  const texto = String(valor ?? '');
+  return /[;"\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+}
+
+/**
+ * Uma linha por atendimento do período, separada por ponto e vírgula
+ * e com números no formato brasileiro (vírgula decimal),
+ * que é como o Excel em português abre sem precisar configurar nada.
+ */
+export function gerarCsv(atendimentos, agora = new Date()) {
+  const cabecalho = [
+    'Número', 'Cliente', 'Telefone', 'Departamento', 'Prioridade', 'Status',
+    'Assunto', 'Abertura', 'Resolução', 'Horas até resolver', 'Dias em espera',
+  ];
+
+  const ordenados = [...atendimentos].sort((a, b) => a.dataAbertura.localeCompare(b.dataAbertura));
+
+  const linhas = ordenados.map((atendimento) => {
+    const resolvidoEm = dataResolucao(atendimento);
+    const horas = resolvidoEm
+      ? ((new Date(resolvidoEm) - new Date(atendimento.dataAbertura)) / 3600000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+      : '';
+    const espera = diasEmEspera(atendimento, agora);
+
+    return [
+      atendimento.id,
+      atendimento.cliente,
+      atendimento.telefone,
+      atendimento.departamento,
+      PRIORIDADES[atendimento.prioridade].rotulo,
+      STATUS[atendimento.status].rotulo,
+      atendimento.assunto,
+      dataHoraCsv(atendimento.dataAbertura),
+      dataHoraCsv(resolvidoEm),
+      horas,
+      espera ?? '',
+    ].map(celula).join(';');
+  });
+
+  return [cabecalho.join(';'), ...linhas].join('\r\n');
+}
+
+/** Nome do arquivo com o período: centraliza-atendimentos-2026-10-01-a-2026-10-30.csv */
+export function nomeArquivoCsv({ inicio, fim }) {
+  if (!inicio && !fim) return 'centraliza-atendimentos-todo-periodo.csv';
+  return `centraliza-atendimentos-${inicio || 'inicio'}-a-${fim || 'hoje'}.csv`;
+}
+

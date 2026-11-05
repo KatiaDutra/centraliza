@@ -426,6 +426,8 @@ export function renderizarRelatorio(relatorio, periodo, { todosClientes = false 
       </tr>`).join('');
 
   renderizarPorCliente(relatorio.porCliente, todosClientes);
+  renderizarGrafico(relatorio.diasDoGrafico);
+  document.getElementById('rel-exportar').disabled = vazio;
 
   // Por dia
   document.getElementById('rel-data').innerHTML = relatorio.porDia.length === 0
@@ -475,5 +477,113 @@ function renderizarPorCliente(clientes, todos) {
       <td>${cliente.resolvidos}</td>
       <td><time datetime="${cliente.ultimo}">${formatarData(cliente.ultimo)}</time></td>
     </tr>`).join('');
+}
+
+/* ---------- Gráfico por dia (SVG desenhado à mão) ---------- */
+
+/**
+ * Topo do eixo: 4 linhas de grade com números redondos.
+ * O passo de cada linha é 1, 2 ou 5 vezes uma potência de 10.
+ * Maior valor 7 → passo 2 → topo 8. Maior valor 13 → passo 5 → topo 20.
+ */
+function topoDoEixo(maior) {
+  const minimo = maior / 4;
+  const potencia = 10 ** Math.floor(Math.log10(minimo));
+  const passo = [1, 2, 5, 10].map((p) => p * potencia).find((p) => p >= minimo);
+  return Math.max(1, passo) * 4;
+}
+
+/*
+ * O gráfico é desenhado na largura real do bloco, para o texto não esticar.
+ * Quando a tela Relatórios está escondida, a largura é zero; o ResizeObserver
+ * avisa quando o bloco aparece ou muda de tamanho, e aí redesenhamos.
+ */
+let diasDoGrafico = [];
+let larguraDesenhada = 0;
+
+const observador = new ResizeObserver(() => {
+  const largura = document.getElementById('rel-grafico').clientWidth;
+  if (largura > 0 && largura !== larguraDesenhada) desenharGrafico();
+});
+
+function renderizarGrafico(dias) {
+  diasDoGrafico = dias;
+  observador.observe(document.getElementById('rel-grafico')); // observar de novo não duplica
+  desenharGrafico();
+}
+
+function desenharGrafico() {
+  const container = document.getElementById('rel-grafico');
+  const dias = diasDoGrafico;
+
+  // Com um dia só, uma tabela de uma linha já diz tudo
+  if (dias.length < 2) {
+    container.innerHTML = '';
+    return;
+  }
+
+  // Medidas em pixels. Cada dia ocupa o que couber, mas nunca menos que 14 px:
+  // com muitos dias, o gráfico passa da largura do bloco e rola para o lado.
+  larguraDesenhada = container.clientWidth;
+  const ESQUERDA = 36; // espaço dos números do eixo
+  const DIREITA = 8;
+  const TOPO = 12;
+  const ALTURA_BARRAS = 160;
+  const disponivel = (larguraDesenhada || 600) - ESQUERDA - DIREITA;
+  const LARGURA_DIA = Math.max(14, Math.min(60, disponivel / dias.length));
+  const BASE = TOPO + ALTURA_BARRAS;
+  const largura = ESQUERDA + dias.length * LARGURA_DIA + DIREITA;
+  const altura = BASE + 28;
+
+  const maior = Math.max(...dias.map((d) => Math.max(d.abertos, d.resolvidos)));
+  const topo = topoDoEixo(Math.max(1, maior));
+  const y = (valor) => BASE - (valor / topo) * ALTURA_BARRAS;
+
+  // 4 linhas de grade com o valor ao lado
+  const grade = [0, 1, 2, 3, 4].map((i) => {
+    const valor = (topo / 4) * i;
+    const posicao = y(valor);
+    return `
+      <line class="grafico__grade" x1="${ESQUERDA}" x2="${largura - 8}" y1="${posicao}" y2="${posicao}"></line>
+      <text class="grafico__eixo" x="${ESQUERDA - 8}" y="${posicao + 4}" text-anchor="end">${Number.isInteger(valor) ? valor : valor.toLocaleString('pt-BR')}</text>`;
+  }).join('');
+
+  // Mostra a data a cada tantos dias, para os rótulos (uns 40 px cada) não se encostarem
+  const intervalo = Math.ceil(44 / LARGURA_DIA);
+
+  const barras = dias.map((dia, indice) => {
+    const folga = LARGURA_DIA * 0.2; // espaço entre um dia e outro
+    const x = ESQUERDA + indice * LARGURA_DIA + folga / 2;
+    const largBarra = (LARGURA_DIA - folga) / 2;
+    const [ano, mes, d] = dia.dia.split('-');
+    const rotulo = indice % intervalo === 0
+      ? `<text class="grafico__eixo" x="${x + largBarra}" y="${BASE + 18}" text-anchor="middle">${d}/${mes}</text>`
+      : '';
+
+    return `
+      <g>
+        <title>${d}/${mes}/${ano}: ${dia.abertos} aberto(s), ${dia.resolvidos} resolvido(s)</title>
+        <rect class="grafico__alvo" x="${x - folga / 2}" y="${TOPO}" width="${LARGURA_DIA}" height="${ALTURA_BARRAS}"></rect>
+        <rect class="grafico__barra grafico__barra--abertos" x="${x}" y="${y(dia.abertos)}" width="${largBarra}" height="${BASE - y(dia.abertos)}" rx="2"></rect>
+        <rect class="grafico__barra grafico__barra--resolvidos" x="${x + largBarra}" y="${y(dia.resolvidos)}" width="${largBarra}" height="${BASE - y(dia.resolvidos)}" rx="2"></rect>
+        ${rotulo}
+      </g>`;
+  }).join('');
+
+  const totalAbertos = dias.reduce((soma, d) => soma + d.abertos, 0);
+  const totalResolvidos = dias.reduce((soma, d) => soma + d.resolvidos, 0);
+
+  container.innerHTML = `
+    <ul class="grafico__legenda" aria-hidden="true">
+      <li><span class="marcador grafico__barra--abertos"></span>Abertos</li>
+      <li><span class="marcador grafico__barra--resolvidos"></span>Resolvidos</li>
+    </ul>
+    <div class="grafico__rolagem">
+      <svg class="grafico" width="${largura}" height="${altura}" viewBox="0 0 ${largura} ${altura}"
+           role="img" aria-label="Gráfico por dia: ${totalAbertos} abertos e ${totalResolvidos} resolvidos em ${dias.length} dias. Os valores de cada dia estão na tabela abaixo.">
+        ${grade}
+        ${barras}
+      </svg>
+    </div>`;
 }
 

@@ -293,7 +293,11 @@
               <input type="date" id="rel-fim">
             </div>
 
-            <button type="button" class="botao botao--secundario" id="rel-limpar">Todo o período</button>
+            <div class="periodo__acoes">
+              <button type="button" class="botao botao--secundario" id="rel-limpar">Todo o período</button>
+              <button type="button" class="botao botao--secundario" id="rel-exportar">Exportar CSV</button>
+              <button type="button" class="botao botao--secundario" id="rel-imprimir">Imprimir</button>
+            </div>
 
             <p class="periodo__descricao" id="rel-descricao" aria-live="polite"></p>
           </section>
@@ -398,7 +402,7 @@
                       aria-controls="rel-cliente" hidden></button>
             </section>
 
-            <!-- Por dia: o gráfico entra no passo 4; a tabela fica como versão acessível -->
+            <!-- Por dia: gráfico em SVG e, embaixo, a tabela com os mesmos números (versão acessível) -->
             <section class="bloco relatorios__largo" aria-labelledby="titulo-rel-data">
               <h3 class="bloco__titulo" id="titulo-rel-data">Por dia</h3>
               <div class="rel-grafico" id="rel-grafico"></div>

@@ -1083,8 +1083,12 @@
   }
 }
 
-.periodo .botao {
+/* Botões: Todo o período, Exportar CSV e Imprimir */
+.periodo__acoes {
   grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 @media (min-width: 768px) {
@@ -1093,7 +1097,7 @@
     justify-content: start;
   }
 
-  .periodo .botao {
+  .periodo__acoes {
     grid-column: auto;
   }
 }
@@ -1153,6 +1157,58 @@
 /* Lugar do gráfico (passo 4): enquanto estiver vazio, não ocupa espaço */
 .rel-grafico:empty {
   display: none;
+}
+
+/* ---------- Gráfico por dia ----------
+   As cores vêm das mesmas variáveis dos status, então o tema escuro funciona sozinho. */
+
+.rel-grafico {
+  display: grid;
+  gap: 8px;
+}
+
+.grafico__rolagem {
+  overflow-x: auto; /* com muitos dias, o gráfico rola em vez de espremer as barras */
+}
+
+.grafico {
+  display: block; /* sem o espacinho que fica embaixo de elementos "inline" */
+}
+
+.grafico__grade {
+  stroke: var(--borda);
+  stroke-width: 1;
+}
+
+.grafico__eixo {
+  font-size: 11px;
+  fill: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Área invisível do dia inteiro: facilita passar o mouse e ver o resumo */
+.grafico__alvo {
+  fill: transparent;
+}
+
+g:hover > .grafico__alvo {
+  fill: var(--fundo);
+}
+
+.grafico__barra--abertos { fill: var(--em-andamento); background: var(--em-andamento); }
+.grafico__barra--resolvidos { fill: var(--resolvido); background: var(--resolvido); }
+
+.grafico__legenda {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.grafico__legenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Tabelas do relatório: pequenas e numéricas.
@@ -1244,5 +1300,47 @@
 /* Botão "Ver todos os clientes", alinhado à esquerda embaixo da tabela */
 .relatorio__mais {
   justify-self: start;
+}
+
+/* ---------- Impressão ----------
+   Só a tela de relatórios usa o botão Imprimir, mas a regra vale para qualquer tela:
+   some o que é de navegar, fica o conteúdo. */
+
+@media print {
+  .sidebar,
+  .topo button,
+  .periodo .campo,
+  .periodo__acoes,
+  .relatorio__mais,
+  .avisos {
+    display: none !important;
+  }
+
+  .app {
+    display: block;
+  }
+
+  .topo {
+    position: static;
+    padding: 0 0 8px;
+  }
+
+  main {
+    padding: 0;
+  }
+
+  .periodo {
+    padding: 0;
+    border: 0;
+  }
+
+  /* Um bloco não fica partido entre duas folhas */
+  .bloco {
+    break-inside: avoid;
+  }
+
+  .grafico__rolagem {
+    overflow: visible;
+  }
 }
 

@@ -20,7 +20,9 @@ import {
   renderizarIndicadores, renderizarRecentes, renderizarLista, renderizarPaginacao,
   mostrarErrosFormulario, mostrarAviso, renderizarDetalhes, confirmar, renderizarRelatorio,
 } from './ui.js';
-import { filtrarPorPeriodo, gerarRelatorio, ajustarPeriodo } from './relatorios.js';
+import {
+  filtrarPorPeriodo, gerarRelatorio, ajustarPeriodo, preencherDias, gerarCsv, nomeArquivoCsv,
+} from './relatorios.js';
 
 /* ---------- Estado: os dados que a aplicação está usando ---------- */
 
@@ -92,7 +94,9 @@ function atualizarLista() {
 function atualizarRelatorio() {
   const periodo = ajustarPeriodo(estado.periodo);
   const doPeriodo = filtrarPorPeriodo(estado.atendimentos, periodo);
-  renderizarRelatorio(gerarRelatorio(doPeriodo, periodo), periodo, { todosClientes: estado.todosClientes });
+  const relatorio = gerarRelatorio(doPeriodo, periodo);
+  relatorio.diasDoGrafico = preencherDias(relatorio.porDia);
+  renderizarRelatorio(relatorio, periodo, { todosClientes: estado.todosClientes });
 }
 
 function buscarAtendimento(id) {
@@ -500,6 +504,33 @@ document.getElementById('rel-clientes-todos').addEventListener('click', () => {
   estado.todosClientes = !estado.todosClientes;
   atualizarRelatorio();
 });
+
+/* ---------- Relatórios: exportar e imprimir ---------- */
+
+/**
+ * Gera o CSV e faz o navegador baixar.
+ * O Blob é um "arquivo" criado na memória; o link temporário com download
+ * é o jeito de pedir ao navegador para salvá-lo.
+ * O \uFEFF no começo avisa o Excel que o arquivo é UTF-8 (senão os acentos quebram).
+ */
+function exportarCsv() {
+  const periodo = ajustarPeriodo(estado.periodo);
+  const doPeriodo = filtrarPorPeriodo(estado.atendimentos, periodo);
+  const arquivo = new Blob(['\uFEFF' + gerarCsv(doPeriodo)], { type: 'text/csv;charset=utf-8' });
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(arquivo);
+  link.download = nomeArquivoCsv(periodo);
+  link.click();
+  URL.revokeObjectURL(link.href);
+
+  mostrarAviso(`Planilha com ${doPeriodo.length} atendimento(s) gerada.`);
+}
+
+document.getElementById('rel-exportar').addEventListener('click', exportarCsv);
+
+// Imprimir: o CSS de impressão (@media print) esconde o menu e os botões
+document.getElementById('rel-imprimir').addEventListener('click', () => window.print());
 
 document.getElementById('rel-limpar').addEventListener('click', () => {
   relInicio.value = '';
