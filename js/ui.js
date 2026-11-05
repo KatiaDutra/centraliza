@@ -5,7 +5,10 @@
    ========================================================== */
 
 import { STATUS, ORDEM_STATUS, PRIORIDADES, DIAS_PARA_ALERTA } from './config.js';
-import { escaparHtml, formatarData, formatarDataHora, apenasDigitos, descreverEspera } from './utils.js';
+import {
+  escaparHtml, formatarData, formatarDataHora, apenasDigitos, descreverEspera,
+  formatarChaveDia, descreverDuracao,
+} from './utils.js';
 import { diasEmEspera } from './atendimentos.js';
 
 /* ---------- Peças pequenas ---------- */
@@ -351,3 +354,85 @@ export function mostrarAviso(mensagem, tipo = 'sucesso') {
 
   area.append(aviso);
 }
+
+/* ---------- Relatórios ---------- */
+
+const formatoPercentual = new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 0 });
+
+/** 0.25 vira "25%". Sem valor, mostra um traço. */
+function textoPercentual(valor) {
+  return valor === null ? '–' : formatoPercentual.format(valor);
+}
+
+function textoDuracao(milissegundos) {
+  return milissegundos === null ? '–' : descreverDuracao(milissegundos);
+}
+
+/** Linha única avisando que não há dados, ocupando todas as colunas. */
+function linhaVazia(colunas, texto = 'Nenhum atendimento no período.') {
+  return `<tr><td class="tabela-relatorio__vazio" colspan="${colunas}">${texto}</td></tr>`;
+}
+
+/** Texto acima do resumo, dizendo qual período está sendo mostrado. */
+function descreverPeriodo({ inicio, fim }, total) {
+  const quantidade = total === 1 ? '1 atendimento' : `${total} atendimentos`;
+  if (!inicio && !fim) return `Mostrando todo o período: ${quantidade}.`;
+  if (inicio && fim) return `De ${formatarChaveDia(inicio)} a ${formatarChaveDia(fim)}: ${quantidade}.`;
+  if (inicio) return `A partir de ${formatarChaveDia(inicio)}: ${quantidade}.`;
+  return `Até ${formatarChaveDia(fim)}: ${quantidade}.`;
+}
+
+export function renderizarRelatorio(relatorio, periodo) {
+  const vazio = relatorio.total === 0;
+
+  document.getElementById('rel-descricao').textContent = descreverPeriodo(periodo, relatorio.total);
+
+  // Resumo
+  document.getElementById('rel-total').textContent = relatorio.total;
+  document.getElementById('rel-resolvidos').textContent = relatorio.resolvidos;
+  document.getElementById('rel-taxa').textContent = textoPercentual(relatorio.taxaResolucao);
+  document.getElementById('rel-tempo-medio').textContent = textoDuracao(relatorio.tempoMedio);
+
+  // Por status
+  document.getElementById('rel-status').innerHTML = vazio
+    ? linhaVazia(3)
+    : relatorio.porStatus.map((linha) => `
+      <tr>
+        <th scope="row"><span class="marcador cor--${linha.status}" aria-hidden="true"></span>${STATUS[linha.status].rotulo}</th>
+        <td>${linha.quantidade}</td>
+        <td>${textoPercentual(linha.percentual)}</td>
+      </tr>`).join('');
+
+  // Tempo em espera
+  const pendentes = relatorio.espera.reduce((total, faixa) => total + faixa.quantidade, 0);
+  document.getElementById('rel-espera').innerHTML = pendentes === 0
+    ? linhaVazia(2, 'Nenhum atendimento pendente no período.')
+    : relatorio.espera.map((faixa) => `
+      <tr class="${faixa.alerta && faixa.quantidade > 0 ? 'linha--alerta' : ''}">
+        <th scope="row">${faixa.rotulo}</th>
+        <td>${faixa.quantidade}</td>
+      </tr>`).join('');
+
+  // Por departamento
+  document.getElementById('rel-departamento').innerHTML = vazio
+    ? linhaVazia(5)
+    : relatorio.porDepartamento.map((linha) => `
+      <tr>
+        <th scope="row">${escaparHtml(linha.departamento)}</th>
+        <td>${linha.total}</td>
+        <td>${linha.pendentes}</td>
+        <td>${linha.resolvidos}</td>
+        <td>${textoDuracao(linha.tempoMedio)}</td>
+      </tr>`).join('');
+
+  // Por dia
+  document.getElementById('rel-data').innerHTML = relatorio.porDia.length === 0
+    ? linhaVazia(3)
+    : relatorio.porDia.map((linha) => `
+      <tr>
+        <th scope="row"><time datetime="${linha.dia}">${formatarChaveDia(linha.dia)}</time></th>
+        <td>${linha.abertos}</td>
+        <td>${linha.resolvidos}</td>
+      </tr>`).join('');
+}
+

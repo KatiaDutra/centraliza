@@ -87,3 +87,35 @@ export function escaparHtml(texto) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+/* ---------- Datas dos relatórios ---------- */
+
+/**
+ * Dia da data no fuso do navegador, no formato do <input type="date">.
+ * "2026-11-05T01:30:00.000Z" vira "2026-11-04" no Brasil (ainda era dia 4 aqui).
+ * Como o formato é ano-mês-dia, dá para comparar com < e > como texto.
+ */
+export function chaveDia(dataIso) {
+  const data = new Date(dataIso);
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const dia = String(data.getDate()).padStart(2, '0');
+  return `${data.getFullYear()}-${mes}-${dia}`;
+}
+
+/** "2026-11-05" vira "05/11/2026" */
+export function formatarChaveDia(chave) {
+  const [ano, mes, dia] = chave.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+/** Duração em milissegundos em texto curto: "35 min", "6 h", "1 dia", "2,5 dias" */
+export function descreverDuracao(milissegundos) {
+  const minutos = Math.round(milissegundos / 60000);
+  if (minutos < 60) return `${Math.max(1, minutos)} min`;
+
+  const horas = Math.round(milissegundos / 3600000);
+  if (horas < 24) return `${horas} h`;
+
+  const dias = Math.round((milissegundos / MILISSEGUNDOS_POR_DIA) * 10) / 10; // 1 casa decimal
+  return dias === 1 ? '1 dia' : `${dias.toLocaleString('pt-BR')} dias`;
+}

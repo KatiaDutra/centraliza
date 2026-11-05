@@ -55,6 +55,7 @@
           <li><a href="#inicio" aria-current="page">Início</a></li>
           <li><a href="#atendimentos">Atendimentos</a></li>
           <li><a href="#novo">Novo atendimento</a></li>
+          <li><a href="#relatorios">Relatórios</a></li>
         </ul>
       </nav>
 
@@ -270,6 +271,130 @@
               <button type="submit" class="botao botao--primario">Registrar atendimento</button>
             </div>
           </form>
+        </section>
+
+        <!-- ========== TELA 4: RELATÓRIOS ========== -->
+        <!-- Os números e as linhas das tabelas são preenchidos pelo JavaScript (relatorios.js e ui.js) -->
+        <section class="tela" data-tela="relatorios">
+          <h2 class="visualmente-oculto">Relatórios</h2>
+          <p class="tela__intro">Analise os atendimentos de um período: volume, status, departamentos e tempo de espera.</p>
+
+          <!-- Período: os dois campos vazios significam "todo o período" -->
+          <section class="bloco periodo" aria-labelledby="titulo-periodo">
+            <h3 class="visualmente-oculto" id="titulo-periodo">Período do relatório</h3>
+
+            <div class="campo">
+              <label for="rel-inicio">De</label>
+              <input type="date" id="rel-inicio">
+            </div>
+
+            <div class="campo">
+              <label for="rel-fim">Até</label>
+              <input type="date" id="rel-fim">
+            </div>
+
+            <button type="button" class="botao botao--secundario" id="rel-limpar">Todo o período</button>
+
+            <p class="periodo__descricao" id="rel-descricao" aria-live="polite"></p>
+          </section>
+
+          <!-- Resumo: mesmo padrão <dl> dos indicadores do Início -->
+          <section class="bloco" aria-labelledby="titulo-rel-resumo">
+            <h3 class="bloco__titulo" id="titulo-rel-resumo">Resumo do período</h3>
+            <dl class="indicadores indicadores--relatorio">
+              <div class="indicador">
+                <dt>Atendimentos abertos</dt>
+                <dd id="rel-total">–</dd>
+              </div>
+              <div class="indicador">
+                <dt>Resolvidos</dt>
+                <dd id="rel-resolvidos">–</dd>
+              </div>
+              <div class="indicador">
+                <dt>Taxa de resolução</dt>
+                <dd id="rel-taxa">–</dd>
+              </div>
+              <div class="indicador">
+                <dt>Tempo médio até resolver</dt>
+                <dd id="rel-tempo-medio">–</dd>
+              </div>
+            </dl>
+          </section>
+
+          <div class="relatorios">
+
+            <!-- Por status -->
+            <section class="bloco" aria-labelledby="titulo-rel-status">
+              <h3 class="bloco__titulo" id="titulo-rel-status">Por status</h3>
+              <div class="tabela-rolagem">
+                <table class="tabela-relatorio">
+                  <thead>
+                    <tr>
+                      <th scope="col">Status</th>
+                      <th scope="col">Quantidade</th>
+                      <th scope="col">% do total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rel-status">                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Tempo em espera: só os que ainda não foram encerrados -->
+            <section class="bloco" aria-labelledby="titulo-rel-espera">
+              <h3 class="bloco__titulo" id="titulo-rel-espera">Tempo em espera</h3>
+              <p class="bloco__nota">Atendimentos ainda não resolvidos nem cancelados.</p>
+              <div class="tabela-rolagem">
+                <table class="tabela-relatorio">
+                  <thead>
+                    <tr>
+                      <th scope="col">Esperando há</th>
+                      <th scope="col">Quantidade</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rel-espera">                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Por departamento -->
+            <section class="bloco relatorios__largo" aria-labelledby="titulo-rel-departamento">
+              <h3 class="bloco__titulo" id="titulo-rel-departamento">Por departamento</h3>
+              <div class="tabela-rolagem">
+                <table class="tabela-relatorio">
+                  <thead>
+                    <tr>
+                      <th scope="col">Departamento</th>
+                      <th scope="col">Total</th>
+                      <th scope="col">Pendentes</th>
+                      <th scope="col">Resolvidos</th>
+                      <th scope="col">Tempo médio até resolver</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rel-departamento">                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Por dia: o gráfico entra no passo 4; a tabela fica como versão acessível -->
+            <section class="bloco relatorios__largo" aria-labelledby="titulo-rel-data">
+              <h3 class="bloco__titulo" id="titulo-rel-data">Por dia</h3>
+              <div class="rel-grafico" id="rel-grafico"></div>
+              <div class="tabela-rolagem">
+                <table class="tabela-relatorio">
+                  <thead>
+                    <tr>
+                      <th scope="col">Data</th>
+                      <th scope="col">Abertos</th>
+                      <th scope="col">Resolvidos</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rel-data">                  </tbody>
+                </table>
+              </div>
+            </section>
+
+          </div>
         </section>
 
       </main>

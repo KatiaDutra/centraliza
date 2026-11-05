@@ -1051,3 +1051,185 @@
     border-left: 0;
   }
 }
+
+/* ---------- Relatórios ---------- */
+
+/* Período: as duas datas lado a lado e o botão embaixo (celular)
+   ou tudo na mesma linha (a partir do tablet) */
+.periodo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 16px;
+}
+
+/* Campo de data tem largura mínima própria: deixa encolher junto com a coluna.
+   O cursor de mãozinha mostra que dá para clicar e abrir o calendário. */
+.periodo input {
+  min-width: 0;
+  cursor: pointer;
+}
+
+/* "De 01/11/2026 a 05/11/2026: 7 atendimentos." */
+.periodo__descricao {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+@media (min-width: 480px) {
+  .periodo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.periodo .botao {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .periodo {
+    grid-template-columns: repeat(2, minmax(0, 220px)) auto;
+    justify-content: start;
+  }
+
+  .periodo .botao {
+    grid-column: auto;
+  }
+}
+
+/* Resumo: 2 por linha no celular e 4 numa linha a partir do tablet.
+   Estas regras vêm depois das do Início para valerem só aqui. */
+.indicadores--relatorio {
+  margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+  .indicadores--relatorio {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .indicadores--relatorio .indicador,
+  .indicadores--relatorio .indicador:nth-child(3n + 1) {
+    padding: 0 24px;
+    border-left: 1px solid var(--borda);
+  }
+
+  .indicadores--relatorio .indicador:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* Blocos de relatório: um embaixo do outro no celular.
+   No computador, os dois pequenos lado a lado e os largos ocupando a linha toda. */
+.relatorios {
+  display: grid;
+  gap: 16px;
+}
+
+.relatorios .bloco {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .relatorios {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .relatorios__largo {
+    grid-column: 1 / -1;
+  }
+}
+
+.bloco__nota {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+/* Lugar do gráfico (passo 4): enquanto estiver vazio, não ocupa espaço */
+.rel-grafico:empty {
+  display: none;
+}
+
+/* Tabelas do relatório: pequenas e numéricas.
+   Diferente da lista de atendimentos, não viram cartões no celular:
+   se não couberem, rolam para o lado dentro da .tabela-rolagem. */
+.tabela-relatorio {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabela-relatorio th,
+.tabela-relatorio td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+}
+
+.tabela-relatorio thead th {
+  background: var(--fundo);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+/* Primeira coluna: o nome da linha (status, departamento, dia) */
+.tabela-relatorio tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Números alinhados à direita, com algarismos de mesma largura,
+   para dar para comparar os valores de cima para baixo */
+.tabela-relatorio td,
+.tabela-relatorio thead th:not(:first-child) {
+  text-align: right;
+}
+
+.tabela-relatorio td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tabela-relatorio tbody tr:last-child th,
+.tabela-relatorio tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela-relatorio tbody tr:hover {
+  background: var(--fundo);
+}
+
+@media (min-width: 768px) {
+  .tabela-relatorio th,
+  .tabela-relatorio td {
+    padding: 10px 12px;
+  }
+}
+
+/* Quadradinho colorido antes do nome do status */
+.tabela-relatorio .marcador {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Linha "5 dias ou mais" em destaque quando tem atendimento nela */
+.tabela-relatorio .linha--alerta th,
+.tabela-relatorio .linha--alerta td {
+  font-weight: 700;
+  color: var(--alerta-texto);
+}
+
+/* Mensagem de tabela vazia: à esquerda e quebrando linha, ao contrário dos números */
+.tabela-relatorio td.tabela-relatorio__vazio {
+  text-align: left;
+  white-space: normal;
+  color: var(--texto-suave);
+}
+

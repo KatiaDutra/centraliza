@@ -18,8 +18,9 @@ import {
 } from './atendimentos.js';
 import {
   renderizarIndicadores, renderizarRecentes, renderizarLista, renderizarPaginacao,
-  mostrarErrosFormulario, mostrarAviso, renderizarDetalhes, confirmar,
+  mostrarErrosFormulario, mostrarAviso, renderizarDetalhes, confirmar, renderizarRelatorio,
 } from './ui.js';
+import { filtrarPorPeriodo, gerarRelatorio, ajustarPeriodo } from './relatorios.js';
 
 /* ---------- Estado: os dados que a aplicação está usando ---------- */
 
@@ -29,6 +30,7 @@ const estado = {
   ordenacao: 'recentes', // chave de ORDENACOES
   pagina: 1,
   detalhesAbertos: null, // id do atendimento aberto no modal, ou null
+  periodo: { inicio: '', fim: '' }, // datas do relatório, no formato "2026-11-05"
 };
 
 /* ---------- Dados ---------- */
@@ -85,6 +87,13 @@ function atualizarLista() {
     total === 1 ? '1 atendimento encontrado' : `${total} atendimentos encontrados`;
 }
 
+/** Desenha a tela Relatórios com os atendimentos abertos no período escolhido. */
+function atualizarRelatorio() {
+  const periodo = ajustarPeriodo(estado.periodo);
+  const doPeriodo = filtrarPorPeriodo(estado.atendimentos, periodo);
+  renderizarRelatorio(gerarRelatorio(doPeriodo, periodo), periodo);
+}
+
 function buscarAtendimento(id) {
   return estado.atendimentos.find((atendimento) => atendimento.id === id);
 }
@@ -104,6 +113,7 @@ function atualizarTela() {
   renderizarIndicadores(calcularIndicadores(atendimentos));
   renderizarRecentes(document.getElementById('lista-recentes'), obterRecentes(atendimentos, QUANTIDADE_RECENTES));
   atualizarLista();
+  atualizarRelatorio();
 
   // Se o modal está aberto, redesenha também os detalhes
   const aberto = estado.detalhesAbertos !== null ? buscarAtendimento(estado.detalhesAbertos) : null;
@@ -122,6 +132,7 @@ const ROTAS = {
   inicio: 'Início',
   atendimentos: 'Atendimentos',
   novo: 'Novo atendimento',
+  relatorios: 'Relatórios',
 };
 
 const titulo = document.querySelector('.topo__titulo');
@@ -457,6 +468,38 @@ const temaDoSistema = window.matchMedia('(prefers-color-scheme: dark)').matches 
 aplicarTema(carregarTema() ?? temaDoSistema);
 
 /* ---------- Início ---------- */
+
+/* ---------- Relatórios: período ---------- */
+
+const relInicio = document.getElementById('rel-inicio');
+const relFim = document.getElementById('rel-fim');
+
+/** Lê as datas, impede escolher um "Até" antes do "De" e redesenha. */
+function mudarPeriodo() {
+  estado.periodo = { inicio: relInicio.value, fim: relFim.value };
+  relFim.min = relInicio.value; // vazio tira o limite
+  relInicio.max = relFim.value;
+  atualizarRelatorio();
+}
+
+for (const campo of [relInicio, relFim]) {
+  // Clicar em qualquer parte do campo abre o calendário, não só no ícone
+  campo.addEventListener('click', () => {
+    try {
+      campo.showPicker();
+    } catch (erro) {
+      // Navegador antigo sem showPicker(): continua dando para digitar a data
+    }
+  });
+
+  campo.addEventListener('change', mudarPeriodo);
+}
+
+document.getElementById('rel-limpar').addEventListener('click', () => {
+  relInicio.value = '';
+  relFim.value = '';
+  mudarPeriodo();
+});
 
 carregarDados();
 atualizarTela();
