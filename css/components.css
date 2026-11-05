@@ -1233,3 +1233,16 @@
   color: var(--texto-suave);
 }
 
+/* Telefone embaixo do nome, na tabela "Por cliente" */
+.tabela-relatorio__detalhe {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+
+/* Botão "Ver todos os clientes", alinhado à esquerda embaixo da tabela */
+.relatorio__mais {
+  justify-self: start;
+}
+

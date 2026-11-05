@@ -44,3 +44,6 @@ export const ITENS_POR_PAGINA = 10;
 
 // A partir de quantos dias em espera o atendimento ganha destaque na lista
 export const DIAS_PARA_ALERTA = 5;
+
+// Quantos clientes a tabela "Por cliente" mostra antes do botão "Ver todos"
+export const CLIENTES_NO_RELATORIO = 10;

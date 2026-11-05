@@ -376,6 +376,28 @@
               </div>
             </section>
 
+            <!-- Por cliente: agrupado pelo telefone, quem abriu mais atendimentos primeiro -->
+            <section class="bloco relatorios__largo" aria-labelledby="titulo-rel-cliente">
+              <h3 class="bloco__titulo" id="titulo-rel-cliente">Por cliente</h3>
+              <p class="bloco__nota" id="rel-clientes-nota"></p>
+              <div class="tabela-rolagem">
+                <table class="tabela-relatorio">
+                  <thead>
+                    <tr>
+                      <th scope="col">Cliente</th>
+                      <th scope="col">Atendimentos</th>
+                      <th scope="col">Pendentes</th>
+                      <th scope="col">Resolvidos</th>
+                      <th scope="col">Último</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rel-cliente"></tbody>
+                </table>
+              </div>
+              <button type="button" class="botao botao--texto relatorio__mais" id="rel-clientes-todos"
+                      aria-controls="rel-cliente" hidden></button>
+            </section>
+
             <!-- Por dia: o gráfico entra no passo 4; a tabela fica como versão acessível -->
             <section class="bloco relatorios__largo" aria-labelledby="titulo-rel-data">
               <h3 class="bloco__titulo" id="titulo-rel-data">Por dia</h3>

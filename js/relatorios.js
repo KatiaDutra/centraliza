@@ -5,7 +5,7 @@
    ========================================================== */
 
 import { STATUS, ORDEM_STATUS, DEPARTAMENTOS, DIAS_PARA_ALERTA } from './config.js';
-import { chaveDia } from './utils.js';
+import { chaveDia, apenasDigitos, normalizarTexto } from './utils.js';
 import { diasEmEspera } from './atendimentos.js';
 
 /** Se a pessoa escolher o "De" depois do "Até", troca os dois. */
@@ -114,6 +114,8 @@ export function gerarRelatorio(atendimentos, periodo = {}, agora = new Date()) {
 
   const porDia = [...dias.values()].sort((a, b) => a.dia.localeCompare(b.dia));
 
+  const porCliente = agruparPorCliente(atendimentos);
+
   return {
     total,
     resolvidos,
@@ -123,5 +125,49 @@ export function gerarRelatorio(atendimentos, periodo = {}, agora = new Date()) {
     espera,
     porDepartamento,
     porDia,
+    porCliente,
   };
+}
+
+/**
+ * Identifica o cliente pelo telefone, só com os números.
+ * O nome é digitado livre ("João", "joão santos"...), então não serve para agrupar.
+ * Sem telefone (registro antigo), usa o nome normalizado como reserva.
+ */
+export function chaveCliente(atendimento) {
+  const telefone = apenasDigitos(atendimento.telefone ?? '');
+  return telefone ? `tel:${telefone}` : `nome:${normalizarTexto(atendimento.cliente)}`;
+}
+
+/**
+ * Quantos atendimentos cada cliente abriu, quantos estão pendentes
+ * e quando foi o último. Quem abriu mais vem primeiro;
+ * no empate, quem abriu por último vem antes.
+ */
+export function agruparPorCliente(atendimentos) {
+  const clientes = new Map();
+
+  // Do mais antigo para o mais recente: assim o nome e o telefone
+  // que ficam guardados são os do atendimento mais novo
+  const emOrdem = [...atendimentos].sort((a, b) => a.dataAbertura.localeCompare(b.dataAbertura));
+
+  for (const atendimento of emOrdem) {
+    const chave = chaveCliente(atendimento);
+
+    if (!clientes.has(chave)) {
+      clientes.set(chave, { chave, total: 0, pendentes: 0, resolvidos: 0 });
+    }
+
+    const cliente = clientes.get(chave);
+    cliente.nome = atendimento.cliente;
+    cliente.telefone = atendimento.telefone ?? '';
+    cliente.ultimo = atendimento.dataAbertura;
+    cliente.total += 1;
+    if (!STATUS[atendimento.status].final) cliente.pendentes += 1;
+    if (atendimento.status === 'resolvido') cliente.resolvidos += 1;
+  }
+
+  return [...clientes.values()].sort((a, b) =>
+    b.total - a.total || b.ultimo.localeCompare(a.ultimo)
+  );
 }

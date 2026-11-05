@@ -4,7 +4,7 @@
    Todo texto que veio do usuário passa por escaparHtml().
    ========================================================== */
 
-import { STATUS, ORDEM_STATUS, PRIORIDADES, DIAS_PARA_ALERTA } from './config.js';
+import { STATUS, ORDEM_STATUS, PRIORIDADES, DIAS_PARA_ALERTA, CLIENTES_NO_RELATORIO } from './config.js';
 import {
   escaparHtml, formatarData, formatarDataHora, apenasDigitos, descreverEspera,
   formatarChaveDia, descreverDuracao,
@@ -382,7 +382,7 @@ function descreverPeriodo({ inicio, fim }, total) {
   return `Até ${formatarChaveDia(fim)}: ${quantidade}.`;
 }
 
-export function renderizarRelatorio(relatorio, periodo) {
+export function renderizarRelatorio(relatorio, periodo, { todosClientes = false } = {}) {
   const vazio = relatorio.total === 0;
 
   document.getElementById('rel-descricao').textContent = descreverPeriodo(periodo, relatorio.total);
@@ -425,6 +425,8 @@ export function renderizarRelatorio(relatorio, periodo) {
         <td>${textoDuracao(linha.tempoMedio)}</td>
       </tr>`).join('');
 
+  renderizarPorCliente(relatorio.porCliente, todosClientes);
+
   // Por dia
   document.getElementById('rel-data').innerHTML = relatorio.porDia.length === 0
     ? linhaVazia(3)
@@ -434,5 +436,44 @@ export function renderizarRelatorio(relatorio, periodo) {
         <td>${linha.abertos}</td>
         <td>${linha.resolvidos}</td>
       </tr>`).join('');
+}
+
+/** Tabela "Por cliente": os que mais abriram atendimentos, ou todos. */
+function renderizarPorCliente(clientes, todos) {
+  const quantidade = clientes.length;
+  const nota = document.getElementById('rel-clientes-nota');
+  const botao = document.getElementById('rel-clientes-todos');
+  const corpo = document.getElementById('rel-cliente');
+
+  if (quantidade === 0) {
+    nota.textContent = '';
+    botao.hidden = true;
+    corpo.innerHTML = linhaVazia(5);
+    return;
+  }
+
+  const recorrentes = clientes.filter((cliente) => cliente.total > 1).length;
+  nota.textContent = `${quantidade === 1 ? '1 cliente abriu' : `${quantidade} clientes abriram`} atendimentos no período`
+    + (recorrentes ? `; ${recorrentes === 1 ? '1 voltou' : `${recorrentes} voltaram`} mais de uma vez.` : '.');
+
+  // O botão só aparece quando há mais clientes do que o limite
+  const cortar = quantidade > CLIENTES_NO_RELATORIO;
+  botao.hidden = !cortar;
+  botao.textContent = todos ? 'Mostrar só os principais' : `Ver todos os ${quantidade} clientes`;
+  botao.setAttribute('aria-expanded', String(todos));
+
+  const visiveis = todos || !cortar ? clientes : clientes.slice(0, CLIENTES_NO_RELATORIO);
+
+  corpo.innerHTML = visiveis.map((cliente) => `
+    <tr>
+      <th scope="row">
+        ${escaparHtml(cliente.nome)}
+        ${cliente.telefone ? `<span class="tabela-relatorio__detalhe">${escaparHtml(cliente.telefone)}</span>` : ''}
+      </th>
+      <td>${cliente.total}</td>
+      <td>${cliente.pendentes}</td>
+      <td>${cliente.resolvidos}</td>
+      <td><time datetime="${cliente.ultimo}">${formatarData(cliente.ultimo)}</time></td>
+    </tr>`).join('');
 }
 

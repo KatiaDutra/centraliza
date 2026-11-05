@@ -31,6 +31,7 @@ const estado = {
   pagina: 1,
   detalhesAbertos: null, // id do atendimento aberto no modal, ou null
   periodo: { inicio: '', fim: '' }, // datas do relatório, no formato "2026-11-05"
+  todosClientes: false, // tabela "Por cliente" mostrando todos ou só os principais
 };
 
 /* ---------- Dados ---------- */
@@ -91,7 +92,7 @@ function atualizarLista() {
 function atualizarRelatorio() {
   const periodo = ajustarPeriodo(estado.periodo);
   const doPeriodo = filtrarPorPeriodo(estado.atendimentos, periodo);
-  renderizarRelatorio(gerarRelatorio(doPeriodo, periodo), periodo);
+  renderizarRelatorio(gerarRelatorio(doPeriodo, periodo), periodo, { todosClientes: estado.todosClientes });
 }
 
 function buscarAtendimento(id) {
@@ -494,6 +495,11 @@ for (const campo of [relInicio, relFim]) {
 
   campo.addEventListener('change', mudarPeriodo);
 }
+
+document.getElementById('rel-clientes-todos').addEventListener('click', () => {
+  estado.todosClientes = !estado.todosClientes;
+  atualizarRelatorio();
+});
 
 document.getElementById('rel-limpar').addEventListener('click', () => {
   relInicio.value = '';
