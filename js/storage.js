@@ -5,6 +5,8 @@
    ========================================================== */
 
 const CHAVE_ATENDIMENTOS = 'centraliza:atendimentos';
+const CHAVE_PROXIMO_ID = 'centraliza:proximo-id';
+const ID_INICIAL = 1001;
 
 /**
  * Carrega os atendimentos salvos no navegador.
@@ -44,4 +46,29 @@ export function salvarAtendimentos(atendimentos) {
   } catch (erro) {
     return false;
   }
+}
+
+/**
+ * Reserva o próximo número de atendimento e já guarda o seguinte.
+ * Usa o maior valor entre o contador salvo e os números que já existem,
+ * para nunca repetir um número.
+ */
+export function reservarProximoId(atendimentos) {
+  let contadorSalvo = 0;
+  try {
+    contadorSalvo = Number(localStorage.getItem(CHAVE_PROXIMO_ID)) || 0;
+  } catch (erro) {
+    contadorSalvo = 0;
+  }
+
+  const maiorExistente = atendimentos.reduce((maior, atendimento) => Math.max(maior, atendimento.id), 0);
+  const id = Math.max(contadorSalvo, maiorExistente + 1, ID_INICIAL);
+
+  try {
+    localStorage.setItem(CHAVE_PROXIMO_ID, String(id + 1));
+  } catch (erro) {
+    // Sem localStorage, o número continua certo nesta sessão pelo maiorExistente
+  }
+
+  return id;
 }

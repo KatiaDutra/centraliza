@@ -24,3 +24,10 @@ export const PRIORIDADES = {
 export const DEPARTAMENTOS = ['Vendas', 'Suporte', 'Financeiro', 'Entregas'];
 
 export const QUANTIDADE_RECENTES = 5;
+
+// Limites de tamanho dos campos do formulário
+export const LIMITES = {
+  nomeMinimo: 3,
+  assunto: 80,
+  descricao: 500,
+};

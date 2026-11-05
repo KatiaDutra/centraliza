@@ -5,7 +5,81 @@
    testar cada uma no console do navegador.
    ========================================================== */
 
-import { STATUS, ORDEM_STATUS, PRIORIDADES } from './config.js';
+import { STATUS, ORDEM_STATUS, PRIORIDADES, DEPARTAMENTOS, LIMITES } from './config.js';
+import { apenasDigitos, formatarTelefone } from './utils.js';
+
+/* ---------- Validação e criação ---------- */
+
+/**
+ * Confere os dados do formulário.
+ * Devolve um objeto com uma mensagem por campo com problema.
+ * Objeto vazio ({}) significa que está tudo certo.
+ */
+export function validarAtendimento(dados) {
+  const erros = {};
+  const nome = dados.cliente.trim();
+  const telefone = apenasDigitos(dados.telefone);
+  const assunto = dados.assunto.trim();
+  const descricao = dados.descricao.trim();
+
+  if (!nome) {
+    erros.cliente = 'Informe o nome do cliente.';
+  } else if (nome.length < LIMITES.nomeMinimo) {
+    erros.cliente = `O nome precisa ter pelo menos ${LIMITES.nomeMinimo} letras.`;
+  }
+
+  if (!telefone) {
+    erros.telefone = 'Informe o telefone do cliente.';
+  } else if (telefone.length < 10 || telefone.length > 11) {
+    erros.telefone = 'Digite o telefone com DDD, por exemplo (11) 98765-4321.';
+  }
+
+  if (!DEPARTAMENTOS.includes(dados.departamento)) {
+    erros.departamento = 'Escolha o departamento responsável.';
+  }
+
+  if (!PRIORIDADES[dados.prioridade]) {
+    erros.prioridade = 'Escolha a prioridade.';
+  }
+
+  if (!assunto) {
+    erros.assunto = 'Informe o assunto.';
+  } else if (assunto.length > LIMITES.assunto) {
+    erros.assunto = `O assunto pode ter no máximo ${LIMITES.assunto} caracteres.`;
+  }
+
+  if (!descricao) {
+    erros.descricao = 'Descreva a solicitação do cliente.';
+  } else if (descricao.length > LIMITES.descricao) {
+    erros.descricao = `A descrição pode ter no máximo ${LIMITES.descricao} caracteres.`;
+  }
+
+  return erros;
+}
+
+/**
+ * Monta um atendimento novo a partir dos dados do formulário.
+ * Todo atendimento começa como "aberto", com a data de agora.
+ */
+export function criarAtendimento(dados, id, agora = new Date()) {
+  const dataAtual = agora.toISOString();
+
+  return {
+    id,
+    cliente: dados.cliente.trim(),
+    telefone: formatarTelefone(dados.telefone),
+    departamento: dados.departamento,
+    prioridade: dados.prioridade,
+    assunto: dados.assunto.trim(),
+    descricao: dados.descricao.trim(),
+    status: 'aberto',
+    dataAbertura: dataAtual,
+    ultimaAtualizacao: dataAtual,
+    historico: [{ status: 'aberto', data: dataAtual }],
+  };
+}
+
+/* ---------- Leitura e indicadores ---------- */
 
 /**
  * Descarta registros salvos que não tenham o formato esperado.

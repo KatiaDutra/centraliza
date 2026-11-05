@@ -149,3 +149,55 @@ export function renderizarLista(container, atendimentos) {
       </table>
     </div>`;
 }
+
+/* ---------- Erros do formulário ---------- */
+
+const CAMPOS_FORMULARIO = ['cliente', 'telefone', 'departamento', 'prioridade', 'assunto', 'descricao'];
+
+/**
+ * Mostra a mensagem de cada campo com erro e limpa a dos que estão certos.
+ * aria-invalid="true" deixa a borda vermelha (CSS) e avisa o leitor de tela.
+ */
+export function mostrarErrosFormulario(formulario, erros) {
+  for (const campo of CAMPOS_FORMULARIO) {
+    // A prioridade é um grupo de rádios: o aviso vai no fieldset inteiro
+    const elemento = campo === 'prioridade'
+      ? formulario.querySelector('#grupo-prioridade')
+      : formulario.elements[campo];
+    const mensagem = formulario.querySelector(`#erro-${campo}`);
+
+    if (erros[campo]) {
+      elemento.setAttribute('aria-invalid', 'true');
+      mensagem.textContent = erros[campo];
+    } else {
+      elemento.removeAttribute('aria-invalid');
+      mensagem.textContent = '';
+    }
+  }
+}
+
+/* ---------- Avisos (toasts) ---------- */
+
+/**
+ * Mostra um aviso no canto da tela, que some sozinho.
+ * tipo: 'sucesso' | 'erro' | 'aviso'
+ */
+export function mostrarAviso(mensagem, tipo = 'sucesso') {
+  const area = document.getElementById('avisos');
+
+  // Um sucesso torna os avisos de erro anteriores desatualizados: tira da tela
+  if (tipo === 'sucesso') {
+    area.querySelectorAll('.aviso--erro').forEach((antigo) => antigo.remove());
+  }
+
+  const aviso = document.createElement('div');
+  aviso.className = `aviso aviso--${tipo}`;
+  aviso.innerHTML = '<p></p><button type="button" aria-label="Fechar aviso">&times;</button>';
+  aviso.querySelector('p').textContent = mensagem; // textContent: nunca vira HTML
+
+  const remover = () => aviso.remove();
+  aviso.querySelector('button').addEventListener('click', remover);
+  setTimeout(remover, tipo === 'erro' ? 7000 : 4500); // erros ficam mais tempo
+
+  area.append(aviso);
+}

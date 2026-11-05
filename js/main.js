@@ -5,11 +5,18 @@
    e o desenho em ui.js.
    ========================================================== */
 
-import { QUANTIDADE_RECENTES } from './config.js';
-import { carregarAtendimentos, salvarAtendimentos } from './storage.js';
+import { QUANTIDADE_RECENTES, LIMITES } from './config.js';
+import { formatarTelefone, formatarDataHora } from './utils.js';
+import { carregarAtendimentos, salvarAtendimentos, reservarProximoId } from './storage.js';
 import { gerarAtendimentosExemplo } from './exemplos.js';
-import { filtrarRegistrosValidos, calcularIndicadores, ordenarPorMaisRecente, obterRecentes } from './atendimentos.js';
-import { renderizarIndicadores, renderizarRecentes, renderizarLista } from './ui.js';
+import {
+  validarAtendimento, criarAtendimento,
+  filtrarRegistrosValidos, calcularIndicadores, ordenarPorMaisRecente, obterRecentes,
+} from './atendimentos.js';
+import {
+  renderizarIndicadores, renderizarRecentes, renderizarLista,
+  mostrarErrosFormulario, mostrarAviso,
+} from './ui.js';
 
 /* ---------- Estado: os dados que a aplicação está usando ---------- */
 
@@ -31,11 +38,18 @@ function carregarDados() {
 
   estado.atendimentos = filtrarRegistrosValidos(atendimentos);
 
-  // Por enquanto só avisamos no console; no passo 10 isso vira um aviso na tela
   if (situacao === 'corrompido') {
-    console.warn('Os dados salvos estavam ilegíveis e foram ignorados.');
+    mostrarAviso('Os dados salvos neste navegador estavam ilegíveis e foram ignorados. A lista começou vazia.', 'erro');
   } else if (situacao === 'indisponivel') {
-    console.warn('O navegador bloqueou o localStorage. Os dados não serão salvos.');
+    mostrarAviso('O navegador bloqueou o armazenamento local. Os atendimentos não serão mantidos ao fechar a página.', 'aviso');
+  }
+}
+
+/** Salva e avisa se o navegador não deixou. */
+function persistir() {
+  const salvou = salvarAtendimentos(estado.atendimentos);
+  if (!salvou) {
+    mostrarAviso('Não foi possível salvar no navegador. A alteração vale só até fechar a página.', 'aviso');
   }
 }
 
@@ -89,6 +103,8 @@ function mostrarTela() {
   titulo.textContent = ROTAS[rota];
   document.title = `${ROTAS[rota]} | Centraliza`;
   window.scrollTo(0, 0);
+
+  if (rota === 'novo') atualizarDataPrevista();
 }
 
 window.addEventListener('hashchange', () => {
@@ -97,6 +113,98 @@ window.addEventListener('hashchange', () => {
 
   mostrarTela();
   conteudo.focus({ preventScroll: true });
+});
+
+/* ---------- Formulário de cadastro ---------- */
+
+const formulario = document.getElementById('form-atendimento');
+const campos = formulario.elements; // acesso aos campos pelo name: campos.cliente, campos.telefone...
+
+/** Junta os valores do formulário num objeto. */
+function lerFormulario() {
+  return {
+    cliente: campos.cliente.value,
+    telefone: campos.telefone.value,
+    departamento: campos.departamento.value,
+    prioridade: campos.prioridade.value, // nos rádios, devolve o valor do marcado
+    assunto: campos.assunto.value,
+    descricao: campos.descricao.value,
+  };
+}
+
+function atualizarContadores() {
+  document.getElementById('contador-assunto').textContent = `${campos.assunto.value.length}/${LIMITES.assunto}`;
+  document.getElementById('contador-descricao').textContent = `${campos.descricao.value.length}/${LIMITES.descricao}`;
+}
+
+function atualizarDataPrevista() {
+  document.getElementById('data-prevista').textContent = formatarDataHora(new Date().toISOString());
+}
+
+/** Coloca o cursor no primeiro campo com erro. */
+function focarPrimeiroErro(erros) {
+  const ordem = ['cliente', 'telefone', 'departamento', 'prioridade', 'assunto', 'descricao'];
+  const primeiro = ordem.find((campo) => erros[campo]);
+  if (!primeiro) return;
+
+  if (primeiro === 'prioridade') {
+    formulario.querySelector('input[name="prioridade"]').focus();
+  } else {
+    campos[primeiro].focus();
+  }
+}
+
+// Máscara: reescreve o telefone formatado a cada tecla
+campos.telefone.addEventListener('input', () => {
+  campos.telefone.value = formatarTelefone(campos.telefone.value);
+});
+
+// Qualquer digitação no formulário
+formulario.addEventListener('input', () => {
+  atualizarContadores();
+
+  // Depois da primeira tentativa de envio, o erro some assim que o campo é corrigido
+  if (formulario.dataset.tentouEnviar) {
+    mostrarErrosFormulario(formulario, validarAtendimento(lerFormulario()));
+  }
+});
+
+formulario.addEventListener('submit', (evento) => {
+  evento.preventDefault(); // impede o navegador de recarregar a página
+
+  const dados = lerFormulario();
+  const erros = validarAtendimento(dados);
+  mostrarErrosFormulario(formulario, erros);
+
+  // Tem erro: marca a tentativa, leva ao campo e avisa
+  if (Object.keys(erros).length > 0) {
+    formulario.dataset.tentouEnviar = 'true';
+    focarPrimeiroErro(erros);
+    mostrarAviso('Corrija os campos destacados para registrar o atendimento.', 'erro');
+    return;
+  }
+
+  // Tudo certo: cria, guarda, salva e redesenha
+  const id = reservarProximoId(estado.atendimentos);
+  estado.atendimentos = [...estado.atendimentos, criarAtendimento(dados, id)];
+  persistir();
+  atualizarTela();
+
+  formulario.reset();
+  mostrarAviso(`Atendimento #${id} registrado.`);
+  campos.cliente.focus();
+});
+
+// Botão "Limpar campos" (e o reset depois de salvar)
+formulario.addEventListener('reset', () => {
+  delete formulario.dataset.tentouEnviar;
+  mostrarErrosFormulario(formulario, {});
+
+  // O navegador só limpa os campos depois deste evento, então esperamos um instante
+  setTimeout(() => {
+    atualizarContadores();
+    atualizarDataPrevista();
+  });
 });
 
 /* ---------- Início ---------- */

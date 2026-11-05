@@ -231,7 +231,8 @@
             </div>
 
             <p class="formulario__data">
-              A data de abertura é registrada automaticamente ao salvar.
+              A data de abertura é registrada automaticamente ao salvar:
+              <strong id="data-prevista"></strong>
             </p>
 
             <div class="formulario__acoes">
@@ -300,6 +301,9 @@
 
     </div>
   </dialog>
+
+  <!-- Avisos que aparecem no canto da tela. aria-live faz o leitor de tela anunciar. -->
+  <div class="avisos" id="avisos" aria-live="polite"></div>
 
 </body>
 </html>
