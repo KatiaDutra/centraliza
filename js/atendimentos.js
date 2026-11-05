@@ -6,7 +6,7 @@
    ========================================================== */
 
 import { STATUS, ORDEM_STATUS, PRIORIDADES, DEPARTAMENTOS, LIMITES } from './config.js';
-import { apenasDigitos, formatarTelefone } from './utils.js';
+import { apenasDigitos, formatarTelefone, normalizarTexto } from './utils.js';
 
 /* ---------- Validação e criação ---------- */
 
@@ -115,12 +115,72 @@ export function calcularIndicadores(atendimentos) {
   return contagem;
 }
 
-/** Devolve uma cópia da lista com os mais recentes primeiro. */
-export function ordenarPorMaisRecente(atendimentos) {
+/* ---------- Pesquisa, ordenação e paginação ---------- */
+
+/**
+ * Aplica a pesquisa e os dois filtros ao mesmo tempo.
+ * A pesquisa aceita o nome do cliente (sem diferenciar acentos e maiúsculas)
+ * ou o número do atendimento, com ou sem "#".
+ * Filtro vazio ('') quer dizer "todos".
+ */
+export function filtrarAtendimentos(atendimentos, { texto = '', departamento = '', status = '' }) {
+  const termo = normalizarTexto(texto).replace(/^#/, '');
+
+  return atendimentos.filter((atendimento) => {
+    const combinaTexto =
+      !termo ||
+      normalizarTexto(atendimento.cliente).includes(termo) ||
+      String(atendimento.id).includes(termo);
+
+    const combinaDepartamento = !departamento || atendimento.departamento === departamento;
+    const combinaStatus = !status || atendimento.status === status;
+
+    return combinaTexto && combinaDepartamento && combinaStatus;
+  });
+}
+
+/*
+ * Funções de comparação para o sort().
+ * Cada uma devolve um número negativo se "a" vem antes de "b",
+ * positivo se vem depois e zero se empatam.
+ */
+const comparadores = {
+  dataAbertura: (a, b) => a.dataAbertura.localeCompare(b.dataAbertura),
+  prioridade: (a, b) => PRIORIDADES[a.prioridade].peso - PRIORIDADES[b.prioridade].peso,
+  status: (a, b) => ORDEM_STATUS.indexOf(a.status) - ORDEM_STATUS.indexOf(b.status),
+};
+
+/**
+ * Devolve uma cópia ordenada da lista.
+ * direcao 'asc' = crescente, 'desc' = decrescente.
+ * Em caso de empate, o atendimento mais recente vem primeiro.
+ */
+export function ordenarAtendimentos(atendimentos, { campo, direcao }) {
+  const comparar = comparadores[campo];
+  const sinal = direcao === 'asc' ? 1 : -1;
+
   // [...lista] faz uma cópia: o sort() não altera a lista original
-  return [...atendimentos].sort((a, b) => b.dataAbertura.localeCompare(a.dataAbertura));
+  return [...atendimentos].sort((a, b) =>
+    sinal * comparar(a, b) || b.dataAbertura.localeCompare(a.dataAbertura)
+  );
+}
+
+/**
+ * Corta a lista na página pedida.
+ * Se a página pedida não existir (ex.: página 3 de 2), usa a mais próxima válida.
+ */
+export function paginar(lista, paginaPedida, itensPorPagina) {
+  const totalPaginas = Math.max(1, Math.ceil(lista.length / itensPorPagina));
+  const pagina = Math.min(Math.max(1, paginaPedida), totalPaginas);
+  const inicio = (pagina - 1) * itensPorPagina;
+
+  return {
+    itens: lista.slice(inicio, inicio + itensPorPagina),
+    pagina,
+    totalPaginas,
+  };
 }
 
 export function obterRecentes(atendimentos, quantidade) {
-  return ordenarPorMaisRecente(atendimentos).slice(0, quantidade);
+  return ordenarAtendimentos(atendimentos, { campo: 'dataAbertura', direcao: 'desc' }).slice(0, quantidade);
 }

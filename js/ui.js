@@ -60,8 +60,22 @@ export function renderizarIndicadores(contagem) {
 
 /* ---------- Tabelas ---------- */
 
-/** Mensagem exibida quando não há nada para listar. */
-function estadoVazio(container) {
+/**
+ * Mensagem exibida quando não há nada para listar.
+ * Com filtros ativos, a orientação é limpar os filtros;
+ * sem filtros, é cadastrar o primeiro atendimento.
+ */
+function estadoVazio(container, temFiltro = false) {
+  if (temFiltro) {
+    container.innerHTML = `
+      <div class="vazio">
+        <p class="vazio__titulo">Nenhum atendimento encontrado</p>
+        <p>Confira a pesquisa ou limpe os filtros para ver todos os atendimentos.</p>
+        <button type="button" class="botao botao--secundario" data-acao="limpar-filtros">Limpar filtros</button>
+      </div>`;
+    return;
+  }
+
   container.innerHTML = `
     <div class="vazio">
       <p class="vazio__titulo">Nenhum atendimento registrado ainda</p>
@@ -107,9 +121,9 @@ export function renderizarRecentes(container, atendimentos) {
 }
 
 /** Tabela completa da tela Atendimentos. */
-export function renderizarLista(container, atendimentos) {
+export function renderizarLista(container, atendimentos, temFiltro) {
   if (atendimentos.length === 0) {
-    estadoVazio(container);
+    estadoVazio(container, temFiltro);
     return;
   }
 
@@ -148,6 +162,24 @@ export function renderizarLista(container, atendimentos) {
         <tbody>${linhas}</tbody>
       </table>
     </div>`;
+}
+
+/* ---------- Paginação ---------- */
+
+export function renderizarPaginacao(container, { pagina, totalPaginas }) {
+  // Com uma página só, não há o que paginar
+  if (totalPaginas <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const primeira = pagina === 1 ? 'disabled' : '';
+  const ultima = pagina === totalPaginas ? 'disabled' : '';
+
+  container.innerHTML = `
+    <button type="button" class="botao botao--secundario" data-pagina="${pagina - 1}" ${primeira}>Anterior</button>
+    <p>Página ${pagina} de ${totalPaginas}</p>
+    <button type="button" class="botao botao--secundario" data-pagina="${pagina + 1}" ${ultima}>Próxima</button>`;
 }
 
 /* ---------- Erros do formulário ---------- */

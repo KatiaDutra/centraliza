@@ -5,16 +5,17 @@
    e o desenho em ui.js.
    ========================================================== */
 
-import { QUANTIDADE_RECENTES, LIMITES } from './config.js';
+import { QUANTIDADE_RECENTES, LIMITES, ORDENACOES, ITENS_POR_PAGINA } from './config.js';
 import { formatarTelefone, formatarDataHora } from './utils.js';
 import { carregarAtendimentos, salvarAtendimentos, reservarProximoId } from './storage.js';
 import { gerarAtendimentosExemplo } from './exemplos.js';
 import {
   validarAtendimento, criarAtendimento,
-  filtrarRegistrosValidos, calcularIndicadores, ordenarPorMaisRecente, obterRecentes,
+  filtrarRegistrosValidos, calcularIndicadores, obterRecentes,
+  filtrarAtendimentos, ordenarAtendimentos, paginar,
 } from './atendimentos.js';
 import {
-  renderizarIndicadores, renderizarRecentes, renderizarLista,
+  renderizarIndicadores, renderizarRecentes, renderizarLista, renderizarPaginacao,
   mostrarErrosFormulario, mostrarAviso,
 } from './ui.js';
 
@@ -22,6 +23,9 @@ import {
 
 const estado = {
   atendimentos: [],
+  filtros: { texto: '', departamento: '', status: '' },
+  ordenacao: 'recentes', // chave de ORDENACOES
+  pagina: 1,
 };
 
 /* ---------- Dados ---------- */
@@ -55,16 +59,34 @@ function persistir() {
 
 /* ---------- Desenho das telas ---------- */
 
+/**
+ * Desenha a tela Atendimentos em quatro etapas:
+ * filtra → ordena → corta a página → desenha.
+ */
+function atualizarLista() {
+  const filtrados = filtrarAtendimentos(estado.atendimentos, estado.filtros);
+  const ordenados = ordenarAtendimentos(filtrados, ORDENACOES[estado.ordenacao]);
+  const resultado = paginar(ordenados, estado.pagina, ITENS_POR_PAGINA);
+
+  // Se a página pedida não existia, paginar() corrigiu: guardamos a corrigida
+  estado.pagina = resultado.pagina;
+
+  const temFiltro = Object.values(estado.filtros).some(Boolean); // algum filtro preenchido?
+  renderizarLista(document.getElementById('lista-atendimentos'), resultado.itens, temFiltro);
+  renderizarPaginacao(document.getElementById('paginacao'), resultado);
+
+  const total = filtrados.length;
+  document.getElementById('contagem').textContent =
+    total === 1 ? '1 atendimento encontrado' : `${total} atendimentos encontrados`;
+}
+
+/** Redesenha tudo o que depende dos dados. */
 function atualizarTela() {
   const { atendimentos } = estado;
 
   renderizarIndicadores(calcularIndicadores(atendimentos));
   renderizarRecentes(document.getElementById('lista-recentes'), obterRecentes(atendimentos, QUANTIDADE_RECENTES));
-  renderizarLista(document.getElementById('lista-atendimentos'), ordenarPorMaisRecente(atendimentos));
-
-  const total = atendimentos.length;
-  document.getElementById('contagem').textContent =
-    total === 1 ? '1 atendimento encontrado' : `${total} atendimentos encontrados`;
+  atualizarLista();
 }
 
 /* ---------- Navegação entre as telas (passo 5) ---------- */
@@ -113,6 +135,71 @@ window.addEventListener('hashchange', () => {
 
   mostrarTela();
   conteudo.focus({ preventScroll: true });
+});
+
+/* ---------- Pesquisa, filtros, ordenação e paginação ---------- */
+
+const busca = document.getElementById('busca');
+const filtroDepartamento = document.getElementById('filtro-departamento');
+const filtroStatus = document.getElementById('filtro-status');
+const ordenacao = document.getElementById('ordenacao');
+
+// Toda mudança de filtro volta para a página 1,
+// senão a pessoa poderia ficar numa página que não existe mais.
+
+busca.addEventListener('input', () => {
+  estado.filtros.texto = busca.value;
+  estado.pagina = 1;
+  atualizarLista();
+});
+
+filtroDepartamento.addEventListener('change', () => {
+  estado.filtros.departamento = filtroDepartamento.value;
+  estado.pagina = 1;
+  atualizarLista();
+});
+
+filtroStatus.addEventListener('change', () => {
+  estado.filtros.status = filtroStatus.value;
+  estado.pagina = 1;
+  atualizarLista();
+});
+
+ordenacao.addEventListener('change', () => {
+  estado.ordenacao = ordenacao.value;
+  estado.pagina = 1;
+  atualizarLista();
+});
+
+function limparFiltros() {
+  estado.filtros = { texto: '', departamento: '', status: '' };
+  estado.pagina = 1;
+  busca.value = '';
+  filtroDepartamento.value = '';
+  filtroStatus.value = '';
+  atualizarLista();
+  busca.focus();
+}
+
+document.getElementById('limpar-filtros').addEventListener('click', limparFiltros);
+
+/*
+ * O botão "Limpar filtros" da lista vazia e os botões da paginação
+ * são criados pelo JavaScript depois que a página carregou.
+ * Por isso escutamos o clique no container, que existe desde o início,
+ * e descobrimos em qual botão foi (técnica chamada "delegação de eventos").
+ */
+document.getElementById('lista-atendimentos').addEventListener('click', (evento) => {
+  if (evento.target.closest('[data-acao="limpar-filtros"]')) limparFiltros();
+});
+
+document.getElementById('paginacao').addEventListener('click', (evento) => {
+  const botao = evento.target.closest('[data-pagina]');
+  if (!botao) return;
+
+  estado.pagina = Number(botao.dataset.pagina);
+  atualizarLista();
+  document.getElementById('contagem').scrollIntoView({ block: 'start' });
 });
 
 /* ---------- Formulário de cadastro ---------- */

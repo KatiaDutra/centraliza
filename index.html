@@ -150,18 +150,15 @@
           <!-- Listagem -->
           <section class="bloco" aria-labelledby="contagem">
             <div class="bloco__cabecalho">
-              <h3 class="bloco__titulo" id="contagem">Atendimentos</h3>
+              <h3 class="bloco__titulo" id="contagem" aria-live="polite">Atendimentos</h3>
               <a class="botao botao--primario" href="#novo">Novo atendimento</a>
             </div>
 
             <!-- O JavaScript desenha aqui a tabela com todos os atendimentos -->
             <div id="lista-atendimentos"></div>
 
-            <nav class="paginacao" aria-label="Paginação">
-              <button type="button" class="botao botao--secundario" disabled>Anterior</button>
-              <p>Página 1 de 1</p>
-              <button type="button" class="botao botao--secundario" disabled>Próxima</button>
-            </nav>
+            <!-- O JavaScript coloca aqui os botões Anterior e Próxima, quando houver mais de uma página -->
+            <nav class="paginacao" id="paginacao" aria-label="Paginação"></nav>
           </section>
         </section>
 

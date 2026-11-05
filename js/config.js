@@ -31,3 +31,13 @@ export const LIMITES = {
   assunto: 80,
   descricao: 500,
 };
+
+// Opções do "Ordenar por". A chave é o value do <option> no HTML.
+export const ORDENACOES = {
+  recentes: { campo: 'dataAbertura', direcao: 'desc' },
+  antigos: { campo: 'dataAbertura', direcao: 'asc' },
+  prioridade: { campo: 'prioridade', direcao: 'desc' },
+  status: { campo: 'status', direcao: 'asc' },
+};
+
+export const ITENS_POR_PAGINA = 10;

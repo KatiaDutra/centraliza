@@ -730,6 +730,11 @@
 
 /* ---------- Paginação ---------- */
 
+/* Sem botões dentro (uma página só), a área nem aparece */
+.paginacao:empty {
+  display: none;
+}
+
 .paginacao {
   display: flex;
   align-items: center;

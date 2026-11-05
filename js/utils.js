@@ -27,6 +27,18 @@ export function formatarDataHora(dataIso) {
   return formatoDataHora.format(new Date(dataIso)).replace(',', ' às');
 }
 
+/**
+ * Prepara um texto para comparação: tira acentos e espaços nas pontas
+ * e deixa tudo minúsculo. "  João " vira "joao".
+ */
+export function normalizarTexto(texto) {
+  return String(texto)
+    .normalize('NFD')                  // separa a letra do acento: "ã" vira "a" + "~"
+    .replace(/[\u0300-\u036f]/g, '')   // apaga os acentos soltos
+    .toLowerCase()
+    .trim();
+}
+
 /** Tira tudo o que não for número: "(11) 98765-4321" vira "11987654321" */
 export function apenasDigitos(texto) {
   return String(texto).replace(/\D/g, '');
